@@ -43,7 +43,7 @@ RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
 RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git
 RUN cd rgthree-comfy && pip3 install -r requirements.txt
-RUN git clone --depth1 https://github.com/griptape-ai/ComfyUI-Griptape.git
+RUN git clone --depth 1 https://github.com/griptape-ai/ComfyUI-Griptape.git
 RUN cd ComfyUI-Griptape && pip3 install -r requirements.txt
 
 WORKDIR /comfyui
