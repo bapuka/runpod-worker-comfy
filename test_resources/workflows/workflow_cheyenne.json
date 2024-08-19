@@ -1,0 +1,475 @@
+{
+    "input": {
+        "workflow": {
+            "1": {
+                "inputs": {
+                    "image": "reference.png",
+                    "upload": "image"
+                },
+                "class_type": "LoadImage",
+                "_meta": {
+                    "title": "Load Image"
+                }
+            },
+            "2": {
+                "inputs": {
+                    "STRING": "{{ input_string }}",
+                    "image": [
+                        "1",
+                        0
+                    ]
+                },
+                "class_type": "Griptape Run: Image Description",
+                "_meta": {
+                    "title": "Griptape Run: Image Description"
+                }
+            },
+            "3": {
+                "inputs": {
+                    "input_string": [
+                        "2",
+                        0
+                    ],
+                    "STRING": "Summarize it and make more like to this example:\n\"High resolution scene of a little Asian girl, her father in urban setting, with straight shoulder-length hair, colors striking red and deep blacks, style watercolor illustration, mood confident, lighting high contrast with sharp shadows, perspective frontal view, texture leather jacket and smooth skin.\" By following these rules, your AI agent can generate detailed and evocative descriptions and prompts that capture the essence of illustrated imagery.\n",
+                    "rulesets": [
+                        "4",
+                        0
+                    ]
+                },
+                "class_type": "Griptape Create: Agent",
+                "_meta": {
+                    "title": "Griptape Create: Agent"
+                }
+            },
+            "4": {
+                "inputs": {
+                    "name": "My rules",
+                    "rules": "You are an expert an creating amazing storybook illustration text prompts for studio ghibli like high-quality images. Add as much detail as possible. Main character should be a old woman, 60 year old, Asian, dark short hair, with white dress.  Add these style always: Highly stylized digital artwork, trending on artstation, incredible vibrant colors, ray tracing, dynamic epic composition, traditional art by studio ghibli, blur background, volumetric lighting, 8k, high quality.\nShe wears a blue dress.\nShe at the school of her grand daughter. \nMood should be happy, celebrating. It should be wide angle shot"
+                },
+                "class_type": "Griptape Create: Rules",
+                "_meta": {
+                    "title": "Griptape Create: Rules"
+                }
+            },
+            "5": {
+                "inputs": {
+                    "INPUT": [
+                        "3",
+                        0
+                    ],
+                    "Output Text": "High resolution scene of an old Asian woman at her granddaughter's school, with dark short hair, wearing a blue dress, colors vibrant and dynamic, style highly stylized digital artwork, mood happy and celebrating, lighting volumetric with ray tracing, perspective wide angle shot, background blurred with a festive atmosphere, texture smooth fabric and detailed facial expressions."
+                },
+                "class_type": "Griptape Display: Text",
+                "_meta": {
+                    "title": "Griptape Display: Text"
+                }
+            },
+            "6": {
+                "inputs": {
+                    "STRING": "",
+                    "input_string": [
+                        "5",
+                        0
+                    ],
+                    "clip": [
+                        "7",
+                        1
+                    ]
+                },
+                "class_type": "Griptape Create: CLIP Text Encode",
+                "_meta": {
+                    "title": "Griptape Create: CLIP Text Encode"
+                }
+            },
+            "7": {
+                "inputs": {
+                    "ckpt_name": "sdxl/CHEYENNE_v16.safetensors"
+                },
+                "class_type": "CheckpointLoaderSimple",
+                "_meta": {
+                    "title": "Load Checkpoint"
+                }
+            },
+            "8": {
+                "inputs": {
+                    "width": 1024,
+                    "height": 1024,
+                    "batch_size": 4
+                },
+                "class_type": "EmptyLatentImage",
+                "_meta": {
+                    "title": "Empty Latent Image"
+                }
+            },
+            "9": {
+                "inputs": {
+                    "text": "chinese, realistic, breast, text, watermark, (low quality, worst quality:1.4), (bad anatomy), monochrome,(long body), bad anatomy , liquid body, malformed, mutated, anatomical nonsense ,bad proportions, uncoordinated body, unnatural body, ugly, gross proportions, disfigured, deformed,  mutation, poorly drawn , bad hand, mutated hand, bad fingers, mutated finger, mouth open",
+                    "clip": [
+                        "7",
+                        1
+                    ]
+                },
+                "class_type": "CLIPTextEncode",
+                "_meta": {
+                    "title": "Negative"
+                }
+            },
+            "10": {
+                "inputs": {
+                    "seed": 1045038596777253,
+                    "steps": 30,
+                    "cfg": 7,
+                    "sampler_name": "euler",
+                    "scheduler": "normal",
+                    "denoise": 1,
+                    "model": [
+                        "31",
+                        0
+                    ],
+                    "positive": [
+                        "6",
+                        0
+                    ],
+                    "negative": [
+                        "9",
+                        0
+                    ],
+                    "latent_image": [
+                        "8",
+                        0
+                    ]
+                },
+                "class_type": "KSampler",
+                "_meta": {
+                    "title": "KSampler"
+                }
+            },
+            "11": {
+                "inputs": {
+                    "samples": [
+                        "10",
+                        0
+                    ],
+                    "vae": [
+                        "7",
+                        2
+                    ]
+                },
+                "class_type": "VAEDecode",
+                "_meta": {
+                    "title": "VAE Decode"
+                }
+            },
+            "12": {
+                "inputs": {
+                    "images": [
+                        "11",
+                        0
+                    ]
+                },
+                "class_type": "PreviewImage",
+                "_meta": {
+                    "title": "Preview Image"
+                }
+            },
+            "27": {
+                "inputs": {
+                    "weight": 1,
+                    "weight_faceidv2": 1,
+                    "weight_type": "linear",
+                    "combine_embeds": "concat",
+                    "start_at": 0,
+                    "end_at": 1,
+                    "embeds_scaling": "V only",
+                    "model": [
+                        "28",
+                        0
+                    ],
+                    "ipadapter": [
+                        "28",
+                        1
+                    ],
+                    "image": [
+                        "37",
+                        0
+                    ],
+                    "insightface": [
+                        "29",
+                        0
+                    ]
+                },
+                "class_type": "IPAdapterFaceID",
+                "_meta": {
+                    "title": "IPAdapter FaceID"
+                }
+            },
+            "28": {
+                "inputs": {
+                    "preset": "FACEID PLUS V2",
+                    "lora_strength": 0.9,
+                    "provider": "CPU",
+                    "model": [
+                        "53",
+                        1
+                    ]
+                },
+                "class_type": "IPAdapterUnifiedLoaderFaceID",
+                "_meta": {
+                    "title": "IPAdapter Unified Loader FaceID"
+                }
+            },
+            "29": {
+                "inputs": {
+                    "provider": "CPU"
+                },
+                "class_type": "IPAdapterInsightFaceLoader",
+                "_meta": {
+                    "title": "IPAdapter InsightFace Loader"
+                }
+            },
+            "30": {
+                "inputs": {
+                    "image": "input-04.png",
+                    "upload": "image"
+                },
+                "class_type": "LoadImage",
+                "_meta": {
+                    "title": "Load Image"
+                }
+            },
+            "31": {
+                "inputs": {
+                    "hard_mode": false,
+                    "boost": true,
+                    "model": [
+                        "80",
+                        1
+                    ]
+                },
+                "class_type": "Automatic CFG",
+                "_meta": {
+                    "title": "Automatic CFG"
+                }
+            },
+            "35": {
+                "inputs": {
+                    "image": "input-02.png",
+                    "upload": "image"
+                },
+                "class_type": "LoadImage",
+                "_meta": {
+                    "title": "Load Image"
+                }
+            },
+            "36": {
+                "inputs": {
+                    "image": "input-03.png",
+                    "upload": "image"
+                },
+                "class_type": "LoadImage",
+                "_meta": {
+                    "title": "Load Image"
+                }
+            },
+            "37": {
+                "inputs": {
+                    "images_a": [
+                        "30",
+                        0
+                    ],
+                    "images_b": [
+                        "35",
+                        0
+                    ],
+                    "images_c": [
+                        "36",
+                        0
+                    ],
+                    "images_d": [
+                        "148",
+                        0
+                    ]
+                },
+                "class_type": "Image Batch",
+                "_meta": {
+                    "title": "Image Batch"
+                }
+            },
+            "49": {
+                "inputs": {
+                    "model": [
+                        "7",
+                        0
+                    ],
+                    "clip": [
+                        "7",
+                        1
+                    ],
+                    "vae": [
+                        "7",
+                        2
+                    ],
+                    "positive": [
+                        "6",
+                        0
+                    ],
+                    "negative": [
+                        "9",
+                        0
+                    ],
+                    "latent": [
+                        "8",
+                        0
+                    ]
+                },
+                "class_type": "Context Big (rgthree)",
+                "_meta": {
+                    "title": "ctx base"
+                }
+            },
+            "53": {
+                "inputs": {
+                    "base_ctx": [
+                        "49",
+                        0
+                    ]
+                },
+                "class_type": "Context Big (rgthree)",
+                "_meta": {
+                    "title": "ctx base"
+                }
+            },
+            "56": {
+                "inputs": {
+                    "base_ctx": [
+                        "53",
+                        0
+                    ],
+                    "model": [
+                        "27",
+                        0
+                    ],
+                    "latent": [
+                        "107",
+                        0
+                    ]
+                },
+                "class_type": "Context Big (rgthree)",
+                "_meta": {
+                    "title": "ctx IP"
+                }
+            },
+            "58": {
+                "inputs": {
+                    "ctx_01": [
+                        "56",
+                        0
+                    ],
+                    "ctx_02": [
+                        "49",
+                        0
+                    ]
+                },
+                "class_type": "Context Switch (rgthree)",
+                "_meta": {
+                    "title": "ctx"
+                }
+            },
+            "73": {
+                "inputs": {
+                    "ctx_02": [
+                        "58",
+                        0
+                    ],
+                    "ctx_03": [
+                        "49",
+                        0
+                    ]
+                },
+                "class_type": "Context Switch (rgthree)",
+                "_meta": {
+                    "title": "ctx"
+                }
+            },
+            "80": {
+                "inputs": {
+                    "base_ctx": [
+                        "105",
+                        0
+                    ]
+                },
+                "class_type": "Context Big (rgthree)",
+                "_meta": {
+                    "title": "ctx"
+                }
+            },
+            "105": {
+                "inputs": {
+                    "ctx_02": [
+                        "73",
+                        0
+                    ],
+                    "ctx_03": [
+                        "49",
+                        0
+                    ]
+                },
+                "class_type": "Context Switch (rgthree)",
+                "_meta": {
+                    "title": "ctx"
+                }
+            },
+            "107": {
+                "inputs": {
+                    "samples": [
+                        "53",
+                        6
+                    ]
+                },
+                "class_type": "gcLatentTunnel",
+                "_meta": {
+                    "title": "LatentGarbageCollector"
+                }
+            },
+            "114": {
+                "inputs": {
+                    "base_ctx": [
+                        "80",
+                        0
+                    ],
+                    "images": [
+                        "11",
+                        0
+                    ]
+                },
+                "class_type": "Context Big (rgthree)",
+                "_meta": {
+                    "title": "ctx"
+                }
+            },
+            "147": {
+                "inputs": {
+                    "filename_prefix": "ComfyUI",
+                    "images": [
+                        "11",
+                        0
+                    ]
+                },
+                "class_type": "SaveImage",
+                "_meta": {
+                    "title": "Save Image"
+                }
+            },
+            "148": {
+                "inputs": {
+                    "image": "input-01.png",
+                    "upload": "image"
+                },
+                "class_type": "LoadImage",
+                "_meta": {
+                    "title": "Load Image"
+                }
+            }
+        }
+    }
+}
