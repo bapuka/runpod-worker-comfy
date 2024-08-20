@@ -1,0 +1,408 @@
+{
+  "1": {
+    "inputs": {
+      "image": "in_class-01_.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "2": {
+    "inputs": {
+      "image": [
+        "1",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "3": {
+    "inputs": {
+      "rulesets": [
+        "4",
+        0
+      ],
+      "input_string": [
+        "2",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "4": {
+    "inputs": {},
+    "_meta": {}
+  },
+  "5": {
+    "inputs": {
+      "INPUT": [
+        "3",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "6": {
+    "inputs": {
+      "clip": [
+        "7",
+        1
+      ],
+      "input_string": [
+        "5",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "7": {
+    "inputs": {
+      "ckpt_name": "sdxl/CHEYENNE_v16.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "8": {
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 4
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "9": {
+    "inputs": {
+      "text": "chinese, realistic, breast, text, watermark, (low quality, worst quality:1.4), (bad anatomy), monochrome,(long body), bad anatomy , liquid body, malformed, mutated, anatomical nonsense ,bad proportions, uncoordinated body, unnatural body, ugly, gross proportions, disfigured, deformed,  mutation, poorly drawn , bad hand, mutated hand, bad fingers, mutated finger, mouth open",
+      "clip": [
+        "7",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative"
+    }
+  },
+  "10": {
+    "inputs": {
+      "seed": 1045038596777253,
+      "steps": 30,
+      "cfg": 7,
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 1,
+      "model": [
+        "31",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "9",
+        0
+      ],
+      "latent_image": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "11": {
+    "inputs": {
+      "samples": [
+        "10",
+        0
+      ],
+      "vae": [
+        "7",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "12": {
+    "inputs": {
+      "images": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "27": {
+    "inputs": {
+      "model": [
+        "28",
+        0
+      ],
+      "ipadapter": [
+        "28",
+        1
+      ],
+      "image": [
+        "37",
+        0
+      ],
+      "insightface": [
+        "29",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "28": {
+    "inputs": {
+      "model": [
+        "53",
+        1
+      ]
+    },
+    "_meta": {}
+  },
+  "29": {
+    "inputs": {},
+    "_meta": {}
+  },
+  "30": {
+    "inputs": {
+      "image": "grandma-01.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "31": {
+    "inputs": {
+      "model": [
+        "80",
+        1
+      ]
+    },
+    "_meta": {}
+  },
+  "35": {
+    "inputs": {
+      "image": "Enkhulen-02_768x1024.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "36": {
+    "inputs": {
+      "image": "Enkhulen-03_768x1024.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "37": {
+    "inputs": {
+      "images_a": [
+        "30",
+        0
+      ],
+      "images_b": [
+        "35",
+        0
+      ],
+      "images_c": [
+        "36",
+        0
+      ],
+      "images_d": [
+        "148",
+        0
+      ]
+    },
+    "_meta": {}
+  },
+  "49": {
+    "inputs": {
+      "model": [
+        "7",
+        0
+      ],
+      "clip": [
+        "7",
+        1
+      ],
+      "vae": [
+        "7",
+        2
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "9",
+        0
+      ],
+      "latent": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "Context Big (rgthree)",
+    "_meta": {
+      "title": "ctx base"
+    }
+  },
+  "53": {
+    "inputs": {
+      "base_ctx": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "Context Big (rgthree)",
+    "_meta": {
+      "title": "ctx base"
+    }
+  },
+  "56": {
+    "inputs": {
+      "base_ctx": [
+        "53",
+        0
+      ],
+      "model": [
+        "27",
+        0
+      ],
+      "latent": [
+        "53",
+        6
+      ]
+    },
+    "class_type": "Context Big (rgthree)",
+    "_meta": {
+      "title": "ctx IP"
+    }
+  },
+  "58": {
+    "inputs": {
+      "ctx_01": [
+        "56",
+        0
+      ],
+      "ctx_02": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "ctx"
+    }
+  },
+  "73": {
+    "inputs": {
+      "ctx_02": [
+        "58",
+        0
+      ],
+      "ctx_03": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "ctx"
+    }
+  },
+  "80": {
+    "inputs": {
+      "base_ctx": [
+        "105",
+        0
+      ]
+    },
+    "class_type": "Context Big (rgthree)",
+    "_meta": {
+      "title": "ctx"
+    }
+  },
+  "105": {
+    "inputs": {
+      "ctx_02": [
+        "73",
+        0
+      ],
+      "ctx_03": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "ctx"
+    }
+  },
+  "114": {
+    "inputs": {
+      "base_ctx": [
+        "80",
+        0
+      ],
+      "images": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "Context Big (rgthree)",
+    "_meta": {
+      "title": "ctx"
+    }
+  },
+  "147": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "148": {
+    "inputs": {
+      "image": "Enkhulen-01_768x1024.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  }
+}
