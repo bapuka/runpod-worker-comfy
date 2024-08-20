@@ -39,7 +39,7 @@ RUN pip3 install runpod requests
 
 WORKDIR /comfyui/custom_nodes
 
-RUN git clone git@github.com:ntdviet/comfyui-ext.git
+RUN git clone https://github.com/ntdviet/comfyui-ext.git
 RUN cp comfyui-ext/custom_nodes/gcLatentTunnel/gcLatentTunnel.py ./
 RUN rm -rf comfyui-ext
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
