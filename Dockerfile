@@ -39,7 +39,9 @@ RUN pip3 install runpod requests
 
 WORKDIR /comfyui/custom_nodes
 
-# RUN wget https://github.com/ntdviet/comfyui-ext/blob/main/custom_nodes/gcLatentTunnel/gcLatentTunnel.py
+RUN git clone git@github.com:ntdviet/comfyui-ext.git
+RUN cp comfyui-ext/custom_nodes/gcLatentTunnel/gcLatentTunnel.py ./
+RUN rm -rf comfyui-ext
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
 RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
 RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git
@@ -48,20 +50,22 @@ RUN git clone --depth 1 https://github.com/griptape-ai/ComfyUI-Griptape.git
 RUN cd ComfyUI-Griptape && pip3 install -r requirements.txt
 RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
 RUN cd ComfyUI-Impact-Pack && pip3 install -r requirements.txt
-RUN git clone https://github.com/WASasquatch/was-node-suite-comfyui
+RUN git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui
 RUN cd was-node-suite-comfyui && pip3 install -r requirements.txt
-RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
-RUN git clone https://github.com/cubiq/ComfyUI_InstantID.git
+RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
+RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_InstantID.git
 RUN cd ComfyUI_InstantID && pip3 install -r requirements.txt
-RUN git clone https://github.com/cubiq/PuLID_ComfyUI.git
+RUN git clone --depth 1 https://github.com/cubiq/PuLID_ComfyUI.git
 RUN cd PuLID_ComfyUI && pip3 install -r requirements.txt
-RUN git clone https://github.com/Gourieff/comfyui-reactor-node.git
+RUN git clone --depth 1 https://github.com/Gourieff/comfyui-reactor-node.git
 RUN cd comfyui-reactor-node && pip3 install -r requirements.txt
-RUN git clone https://github.com/Extraltodeus/ComfyUI-AutomaticCFG.git
+RUN git clone --depth 1 https://github.com/Extraltodeus/ComfyUI-AutomaticCFG.git
 RUN cd ComfyUI-AutomaticCFG && pip3 install -r requirements.txt
-RUN git clone https://github.com/Extraltodeus/pre_cfg_comfy_nodes_for_ComfyUI.git
-RUN git clone https://github.com/crystian/ComfyUI-Crystools.git
+RUN git clone --depth 1 https://github.com/Extraltodeus/pre_cfg_comfy_nodes_for_ComfyUI.git
+RUN git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git
 RUN cd ComfyUI-Crystools && pip3 install -r requirements.txt
+RUN git clone --depth 1 git@github.com:ntdviet/comfyui-ext.git
+
 
 WORKDIR /comfyui
 
