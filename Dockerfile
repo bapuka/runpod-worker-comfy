@@ -51,7 +51,6 @@ RUN cd ComfyUI-Impact-Pack && pip3 install -r requirements.txt
 RUN git clone https://github.com/WASasquatch/was-node-suite-comfyui
 RUN cd was-node-suite-comfyui && pip3 install -r requirements.txt
 RUN git clone https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
-RUN cd ComfyUI_IPAdapter_plus && pip3 install -r requirements.txt
 RUN git clone https://github.com/cubiq/ComfyUI_InstantID.git
 RUN cd ComfyUI_InstantID && pip3 install -r requirements.txt
 RUN git clone https://github.com/cubiq/PuLID_ComfyUI.git
