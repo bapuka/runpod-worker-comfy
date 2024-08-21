@@ -30,7 +30,7 @@ WORKDIR /comfyui
 # Install ComfyUI dependencies
 RUN pip3 install --upgrade --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 \
     && pip3 install --no-cache-dir xformers==0.0.23 --index-url https://download.pytorch.org/whl/cu121 \
-    && pip3 install --upgrade -r requirements.txt
+    && pip3 install --upgrade -r requirements.txt && pip3 install insightface
 
 # Install runpod
 RUN pip3 install runpod requests
