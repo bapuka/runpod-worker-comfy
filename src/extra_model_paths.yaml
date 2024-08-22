@@ -7,5 +7,6 @@ runpod_worker_comfy:
   controlnet: models/controlnet/
   embeddings: models/embeddings/
   loras: models/loras/
+  ipadapter: models/ipadapter/
   upscale_models: models/upscale_models/
   vae: models/vae/
