@@ -65,6 +65,11 @@ RUN cd ComfyUI-AutomaticCFG && pip3 install -r requirements.txt
 RUN git clone --depth 1 https://github.com/Extraltodeus/pre_cfg_comfy_nodes_for_ComfyUI.git
 RUN git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git
 RUN cd ComfyUI-Crystools && pip3 install -r requirements.txt
+RUN git clone --depth 1 https://github.com/XLabs-AI/x-flux-comfyui.git
+RUN cd x-flux-comfyui && python3 setup.py
+RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git
+RUN cd comfyui_controlnet_aux && pip3 install -r requirements.txt
+
 
 WORKDIR /comfyui
 
