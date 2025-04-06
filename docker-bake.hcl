@@ -39,7 +39,7 @@ variable "PYTHON_VERSION" {
 }
 
 target "default" {
-    dockerfile = "Dockerfile"
+    dockerfile = "Dockerfile.runpod"
     tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:${RELEASE}.post1"]
     args = {
         RELEASE = "${RELEASE}"
