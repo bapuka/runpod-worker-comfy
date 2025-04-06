@@ -1,49 +1,54 @@
-variable "DOCKERHUB_REPO" {
-  default = ""
+variable "REGISTRY" {
+    default = "docker.io"
 }
 
-variable "DOCKERHUB_IMG" {
-  default = ""
+variable "REGISTRY_USER" {
+    default = "bapuka"
 }
 
-variable "RELEASE_VERSION" {
-  default = ""
+variable "APP" {
+    default = "comfyui"
 }
 
-variable "HUGGINGFACE_ACCESS_TOKEN" {
-  default = ""
+variable "RELEASE" {
+    default = "v0.3.27"
 }
 
-group "default" {
-  targets = ["base", "sdxl", "sd3"]
+variable "CU_VERSION" {
+    default = "124"
 }
 
-target "base" {
-  context = "."
-  dockerfile = "Dockerfile"
-  target = "base"
-  tags = ["${DOCKERHUB_REPO}/${DOCKERHUB_IMG}:${RELEASE_VERSION}-base"]
+variable "BASE_IMAGE_REPOSITORY" {
+    default = "bapuka/runpod-base"
 }
 
-target "sdxl" {
-  context = "."
-  dockerfile = "Dockerfile"
-  target = "final"
-  args = {
-    MODEL_TYPE = "sdxl"
-  }
-  tags = ["${DOCKERHUB_REPO}/${DOCKERHUB_IMG}:${RELEASE_VERSION}-sdxl"]
-  inherits = ["base"]
+variable "BASE_IMAGE_VERSION" {
+    default = "1.0.0"
 }
 
-target "sd3" {
-  context = "."
-  dockerfile = "Dockerfile"
-  target = "final"
-  args = {
-    MODEL_TYPE = "sd3"
-    HUGGINGFACE_ACCESS_TOKEN = "${HUGGINGFACE_ACCESS_TOKEN}"
-  }
-  tags = ["${DOCKERHUB_REPO}/${DOCKERHUB_IMG}:${RELEASE_VERSION}-sd3"]
-  inherits = ["base"]
+variable "CUDA_VERSION" {
+    default = "12.4.1"
+}
+
+variable "TORCH_VERSION" {
+    default = "2.5.1"
+}
+
+variable "PYTHON_VERSION" {
+    default = "3.12"
+}
+
+target "default" {
+    dockerfile = "Dockerfile"
+    tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:${RELEASE}.post1"]
+    args = {
+        RELEASE = "${RELEASE}"
+        BASE_IMAGE = "${BASE_IMAGE_REPOSITORY}:${BASE_IMAGE_VERSION}-python${PYTHON_VERSION}-cuda${CUDA_VERSION}-torch${TORCH_VERSION}"
+        INDEX_URL = "https://download.pytorch.org/whl/cu${CU_VERSION}"
+        TORCH_VERSION = "${TORCH_VERSION}+cu${CU_VERSION}"
+        XFORMERS_VERSION = "0.0.29.post1"
+        COMFYUI_VERSION = "${RELEASE}"
+        APP_MANAGER_VERSION = "1.2.2"
+    }
+    platforms = ["linux/amd64"]
 }
