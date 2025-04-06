@@ -15,19 +15,19 @@ variable "RELEASE" {
 }
 
 variable "CU_VERSION" {
-    default = "124"
+    default = "121"
 }
 
 variable "BASE_IMAGE_REPOSITORY" {
-    default = "bapuka/runpod-base"
+    default = "ashleykza/runpod-base"
 }
 
 variable "BASE_IMAGE_VERSION" {
-    default = "1.0.0"
+    default = "2.4.1"
 }
 
 variable "CUDA_VERSION" {
-    default = "12.4.1"
+    default = "12.1.1"
 }
 
 variable "TORCH_VERSION" {
