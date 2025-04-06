@@ -52,9 +52,9 @@ git clone --depth 1 https://github.com/cubiq/PuLID_ComfyUI.git custom_nodes/PuLI
 cd custom_nodes/PuLID_ComfyUI 
 pip3 install -r requirements.txt
 
-git clone --depth 1 https://github.com/Gourieff/comfyui-reactor-node.git custom_nodes/comfyui-reactor-node
-cd custom_nodes/comfyui-reactor-node 
-pip3 install -r requirements.txt
+# git clone --depth 1 https://github.com/Gourieff/comfyui-reactor-node.git custom_nodes/comfyui-reactor-node
+# cd custom_nodes/comfyui-reactor-node 
+# pip3 install -r requirements.txt
 
 git clone --depth 1 https://github.com/Extraltodeus/ComfyUI-AutomaticCFG.git custom_nodes/ComfyUI-AutomaticCFG
 cd custom_nodes/ComfyUI-AutomaticCFG 
