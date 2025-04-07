@@ -7,6 +7,8 @@ export LD_PRELOAD="${TCMALLOC}"
 # Serve the API and don't shutdown the container
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
     echo "runpod-worker-comfy: Starting ComfyUI"
+    pwd
+    ls -la /
     cd /workspace/ComfyUI
     python3 main.py --disable-auto-launch --disable-metadata --listen &
 
