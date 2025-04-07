@@ -58,6 +58,6 @@ RUN chmod +x /workspace/start.sh
 # Start the container
 SHELL ["/bin/bash", "--login", "-c"]
 # ENTRYPOINT [ "start.sh && /workspace/start.sh" ]
-CMD entrypoint.sh
-# CMD [ "/start.sh" ]
+# CMD entrypoint.sh
+CMD [ "/start.sh" ]
 
