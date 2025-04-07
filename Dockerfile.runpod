@@ -7,6 +7,8 @@ RUN apt-get install -y libgl1-mesa-glx libglib2.0-0
 # Clean up to reduce image size
 RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
+RUN pip3 install runpod requests
+
 # Copy the build scripts
 WORKDIR /
 COPY --chmod=755 build/* ./
