@@ -15,6 +15,7 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
 else
     echo "runpod-worker-comfy: Starting ComfyUI"    
     ls -la /workspace
+    ls -la /ComfyUI
     cd /workspace/ComfyUI
     python3 main.py --disable-auto-launch --disable-metadata &
 
