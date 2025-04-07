@@ -24,9 +24,9 @@ RUN /install_comfyui.sh
 WORKDIR /ComfyUI
 ADD src/extra_model_paths.yaml ./
 
-WORKDIR /
-ADD src/start.sh src/rp_handler.py test_input.json ./
-RUN chmod +x /start.sh
+# WORKDIR /
+# ADD src/start.sh src/rp_handler.py test_input.json ./
+# RUN chmod +x /start.sh
 
 # Install Application Manager
 ARG APP_MANAGER_VERSION
