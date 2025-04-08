@@ -16,7 +16,7 @@ pip3 install --no-cache-dir xformers=="${XFORMERS_VERSION}" --index-url https://
 
 # Install requirements
 pip3 install --no-cache-dir -r requirements.txt
-pip3 install --no-cache-dir accelerate insightface
+pip3 install --no-cache-dir accelerate insightface lark compel onnxruntime-gpu bitsandbytes python-dotenv 
 
 # Install runpod
 pip3 install --no-cache-dir runpod requests
