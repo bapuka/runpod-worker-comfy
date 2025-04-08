@@ -52,8 +52,8 @@ WORKDIR /
 # COPY --chmod=755 scripts/* ./
 
 # Copy runpod scripts
-ADD src/start.sh src/rp_handler.py test_input.json /workspace/
-RUN chmod +x /workspace/start.sh
+ADD src/start.sh src/rp_handler.py test_input.json ./
+RUN chmod +x /start.sh
 
 # Start the container
 SHELL ["/bin/bash", "--login", "-c"]
