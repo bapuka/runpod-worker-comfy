@@ -7,16 +7,20 @@ export LD_PRELOAD="${TCMALLOC}"
 # Serve the API and don't shutdown the container
 if [ "$SERVE_API_LOCALLY" == "true" ]; then
     echo "runpod-worker-comfy: Starting ComfyUI"
-    cd /
+    cd /ComfyUI
+    source venv/bin/activate
     python3 ./ComfyUI/main.py --disable-auto-launch --disable-metadata --listen --port 3001 &
-
+    deactivate
+    cd /
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
     echo "runpod-worker-comfy: Starting ComfyUI"    
-    cd /
+    cd /ComfyUI
+    source venv/bin/activate
     python3 ./ComfyUI/main.py --disable-auto-launch --disable-metadata &
-
+    deactivate
+    cd /
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u rp_handler.py
 fi
