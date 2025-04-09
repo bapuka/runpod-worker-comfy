@@ -14,10 +14,9 @@ INPUT_SCHEMA = {
         'type': dict,
         'required': True
     },
-    "images": [
-        {
-            "name": "input-01.png",
-            "image": "base64string",
-        }
-    ]
+    "images": {
+        'type': list,
+        'required': False,
+        'default': []
+    }
 }
