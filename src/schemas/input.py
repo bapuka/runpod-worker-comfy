@@ -13,5 +13,11 @@ INPUT_SCHEMA = {
     'payload': {
         'type': dict,
         'required': True
-    }
+    },
+    "images": [
+        {
+            "name": "input-01.png",
+            "image": "base64string",
+        }
+    ]
 }
