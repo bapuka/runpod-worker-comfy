@@ -318,6 +318,7 @@ def handler(event):
 
         # Extract validated data
         payload = validated_input["validated_input"]
+        rp_logger.info(f'Validated input: {payload}', job_id)
         workflow = payload["workflow"]
         payload = payload['payload']
         images = payload["images"]
