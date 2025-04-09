@@ -310,15 +310,17 @@ def handler(event):
 
     try:
         # Make sure that the input is valid
-        validated_data, error_message = validate(event['input'], INPUT_SCHEMA)
-        if error_message:
-            return {"error": error_message}
+        validated_input = validate(event['input'], INPUT_SCHEMA)
+        if 'errors' in validated_input:
+            return {
+                'error': '\n'.join(validated_input['errors'])
+            }
 
         # Extract validated data
-        payload = validated_data["validated_input"]
-        workflow = validated_data["workflow"]
+        payload = validated_input["validated_input"]
+        workflow = validated_input["workflow"]
         payload = payload['payload']
-        images = validated_data.get("images")
+        images = validated_input.get("images")
         image_names = []
         for image in images:
             name = image["name"]
