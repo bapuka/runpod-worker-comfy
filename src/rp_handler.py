@@ -150,7 +150,7 @@ def check_server(url, retries=500, delay=50):
     return False
 
 def get_workflow_payload(workflow_name, payload, image_names=None):
-    with open(f'workflows/{workflow_name}.json', 'r') as json_file:
+    with open(f'src/workflows/{workflow_name}.json', 'r') as json_file:
         workflow = json.load(json_file)
 
     if workflow_name == 'img2imgPersona':
@@ -178,9 +178,9 @@ def get_img2imgPersona_payload(workflow, payload, image_names):
     workflow["176"]["inputs"]["target_width"] = payload["width"]
     workflow["176"]["inputs"]["target_height"] = payload["height"]
     workflow["184"]["inputs"]["image"] = image_names[0]
-    workflow["186"]["inputs"]["image"] = image_names[1]
-    workflow["188"]["inputs"]["image"] = image_names[2]
-    workflow["190"]["inputs"]["image"] = image_names[3]
+    workflow["186"]["inputs"]["image"] = image_names[0]
+    workflow["188"]["inputs"]["image"] = image_names[0]
+    workflow["190"]["inputs"]["image"] = image_names[0]
     workflow["174"]["inputs"]["text"] = payload["prompt"]
     workflow["176"]["inputs"]["text"] = payload["negative_prompt"]
     return workflow
