@@ -1,5 +1,8 @@
 import runpod
 from runpod.serverless.utils import rp_upload
+from runpod.serverless.modules.rp_logger import RunPodLogger
+import logging
+import logging.handlers
 import json
 import urllib.request
 import urllib.parse
@@ -22,6 +25,31 @@ COMFY_HOST = "127.0.0.1:3001"
 # Enforce a clean state after each job is done
 # see https://docs.runpod.io/docs/handler-additional-controls#refresh-worker
 REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
+
+BASE_URI = 'http://127.0.0.1:3001'
+VOLUME_MOUNT_PATH = '/runpod-volume'
+LOG_FILE= 'comfyui-worker.log'
+LOG_LEVEL = 'INFO'
+
+rp_logger = RunPodLogger()
+
+def wait_for_service(url):
+    retries = 0
+
+    while True:
+        try:
+            requests.get(url)
+            return
+        except requests.exceptions.RequestException:
+            retries += 1
+
+            # Only log every 15 retries so the logs don't get spammed
+            if retries % 15 == 0:
+                rp_logger.info('Service not ready yet. Retrying...')
+        except Exception as err:
+            rp_logger.error(f'Error: {err}')
+
+        time.sleep(0.2)
 
 
 def validate_input(job_input):
@@ -347,4 +375,18 @@ def handler(job):
 
 # Start the handler only if this script is run directly
 if __name__ == "__main__":
+    # Setup log file
+    logging.getLogger().setLevel(LOG_LEVEL)
+    log_handler = logging.handlers.WatchedFileHandler(f'{VOLUME_MOUNT_PATH}/{LOG_FILE}')
+    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+    log_handler.setFormatter(formatter)
+    logging.getLogger().addHandler(log_handler)
+
+    # Set up RunPod logger
+    rp_logger.set_level(LOG_LEVEL)
+
+    wait_for_service(url=f'{BASE_URI}/system_stats')
+    rp_logger.info('ComfyUI API is ready')
+    rp_logger.info('Starting RunPod Serverless...')
+    
     runpod.serverless.start({"handler": handler})
