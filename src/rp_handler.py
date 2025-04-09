@@ -318,10 +318,10 @@ def handler(event):
 
         # Extract validated data
         payload = validated_input["validated_input"]
-        rp_logger.info(f'Validated input: {payload}', job_id)
+        rp_logger.info(f'Validated input: {payload["images"]}', job_id)
         workflow = payload["workflow"]
         payload = payload['payload']
-        images = payload["images"]
+        images = payload['images'] if 'images' in payload else []
         image_names = []
         for image in images:
             name = image["name"]
