@@ -318,9 +318,9 @@ def handler(event):
 
         # Extract validated data
         payload = validated_input["validated_input"]
-        workflow = validated_input["workflow"]
+        workflow = payload["workflow"]
         payload = payload['payload']
-        images = validated_input.get("images")
+        images = payload["images"]
         image_names = []
         for image in images:
             name = image["name"]
