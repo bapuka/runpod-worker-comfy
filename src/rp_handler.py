@@ -150,7 +150,7 @@ def check_server(url, retries=500, delay=50):
     return False
 
 def get_workflow_payload(workflow_name, payload, image_names=None):
-    with open(f'./workflows/{workflow_name}.json', 'r') as json_file:
+    with open(f'workflows/{workflow_name}.json', 'r') as json_file:
         workflow = json.load(json_file)
 
     if workflow_name == 'img2imgPersona':
@@ -315,6 +315,8 @@ def handler(event):
             return {
                 'error': '\n'.join(validated_input['errors'])
             }
+        else:
+            rp_logger.info('Input validated successfully', job_id)
 
         # Extract validated data
         payload = validated_input["validated_input"]        
