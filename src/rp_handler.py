@@ -3,6 +3,7 @@ from runpod.serverless.utils.rp_validator import validate
 from runpod.serverless.utils import rp_upload
 from runpod.serverless.modules.rp_logger import RunPodLogger
 from requests.adapters import HTTPAdapter, Retry
+from schemas.input import INPUT_SCHEMA
 import logging
 import logging.handlers
 import json
@@ -305,11 +306,11 @@ def handler(event):
     Returns:
         dict: A dictionary containing either an error message or a success status with generated images.
     """
-    job_id = event["input"]
+    job_id = event["id"]
 
     try:
         # Make sure that the input is valid
-        validated_data, error_message = validate(job_id)
+        validated_data, error_message = validate(event['input'], INPUT_SCHEMA)
         if error_message:
             return {"error": error_message}
 
