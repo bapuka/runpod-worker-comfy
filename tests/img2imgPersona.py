@@ -5,7 +5,7 @@ import random
 if __name__ == '__main__':
     payload = {
         "input": {
-            "workflow": "txt2img",
+            "workflow": "img2imgPersona",
             "payload": {
                 "seed": random.randrange(1, 1000000),
                 "steps": 30,
