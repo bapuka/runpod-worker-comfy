@@ -377,10 +377,10 @@ def handler(job):
 if __name__ == "__main__":
     # Setup log file
     logging.getLogger().setLevel(LOG_LEVEL)
-    log_handler = logging.handlers.WatchedFileHandler(f'{VOLUME_MOUNT_PATH}/{LOG_FILE}')
-    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
-    log_handler.setFormatter(formatter)
-    logging.getLogger().addHandler(log_handler)
+    # log_handler = logging.handlers.WatchedFileHandler(f'{VOLUME_MOUNT_PATH}/{LOG_FILE}')
+    # formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+    # log_handler.setFormatter(formatter)
+    # logging.getLogger().addHandler(log_handler)
 
     # Set up RunPod logger
     rp_logger.set_level(LOG_LEVEL)
