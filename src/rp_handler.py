@@ -1,4 +1,5 @@
 import runpod
+from runpod.serverless.utils.rp_validator import validate
 from runpod.serverless.utils import rp_upload
 from runpod.serverless.modules.rp_logger import RunPodLogger
 from requests.adapters import HTTPAdapter, Retry
@@ -308,7 +309,7 @@ def handler(event):
 
     try:
         # Make sure that the input is valid
-        validated_data, error_message = validate_input(job_id)
+        validated_data, error_message = validate(job_id)
         if error_message:
             return {"error": error_message}
 
