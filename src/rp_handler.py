@@ -319,10 +319,10 @@ def handler(event):
             rp_logger.info('Input validated successfully', job_id)
 
         # Extract validated data
-        payload = validated_input["validated_input"]        
-        workflow = payload["workflow"]
-        payload = payload['payload']
-        images = payload['images'] if 'images' in payload else []
+        validated_data = validated_input["validated_input"]        
+        workflow = validated_data["workflow"]
+        payload = validated_data['payload']
+        images = validated_data['images'] if 'images' in validated_data else []
         rp_logger.info(f'Validated input: {images}', job_id)
         image_names = []
         for image in images:
