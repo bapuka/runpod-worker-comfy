@@ -72,7 +72,7 @@ def post_request(payload):
         },
         json=payload
     )
-
+    print("Base URL: ", base_url)
     print(f'Status code: {r.status_code}')
 
     if r.status_code == 200:
