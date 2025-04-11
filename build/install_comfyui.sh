@@ -83,6 +83,10 @@ cd custom_nodes/x-flux-comfyui
 python3 setup.py
 
 cd /ComfyUI
+git clone https://github.com/shiimizu/ComfyUI_smZNodes.git custom_nodes/ComfyUI_smZNodes
+git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git custom_nodes/ComfyUI-Custom-Scripts
+
+cd /ComfyUI
 git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/comfyui_controlnet_aux
 cd custom_nodes/comfyui_controlnet_aux 
 pip3 install -r requirements.txt
