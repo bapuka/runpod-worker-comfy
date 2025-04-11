@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>runpod-worker-comfy</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="runpod-worker-comfy">runpod-worker-comfy</h1>
+<blockquote>
+<p><a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> as a serverless API on <a href="https://www.runpod.io/">RunPod</a></p>
+</blockquote>
+<p align="center">
+  <img src="file:///d:\work\runpod-worker-comfy\assets\worker_sitting_in_comfy_chair.jpg" title="Worker sitting in comfy chair" />
+</p>
+<p>Read our article here: <a href="https://blib.la/blog/comfyui-on-runpod">https://blib.la/blog/comfyui-on-runpod</a></p>
+<p><a href="https://discord.com/invite/m3TBB9XEkb"><img src="https://img.shields.io/discord/1091306623819059300?color=7289da&amp;label=Discord&amp;logo=discord&amp;logoColor=fff&amp;style=for-the-badge" alt="Discord"></a></p>
+<p>→ Please also checkout <a href="https://github.com/blib-la/captain">Captain: The AI Platform</a></p>
+<hr>
+<!-- toc -->
+<ul>
+<li><a href="#runpod-worker-comfy">runpod-worker-comfy</a>
+<ul>
+<li><a href="#quickstart">Quickstart</a></li>
+<li><a href="#features">Features</a></li>
+<li><a href="#config">Config</a>
+<ul>
+<li><a href="#upload-image-to-aws-s3">Upload image to AWS S3</a></li>
+</ul>
+</li>
+<li><a href="#use-the-docker-image-on-runpod">Use the Docker image on RunPod</a></li>
+<li><a href="#api-specification">API specification</a>
+<ul>
+<li><a href="#json-request-body">JSON Request Body</a></li>
+<li><a href="#fields">Fields</a>
+<ul>
+<li><a href="#inputimages">&quot;input.images&quot;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#interact-with-your-runpod-api">Interact with your RunPod API</a>
+<ul>
+<li><a href="#health-status">Health status</a></li>
+<li><a href="#generate-an-image">Generate an image</a>
+<ul>
+<li><a href="#example-request-with-curl">Example request with cURL</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#how-to-get-the-workflow-from-comfyui">How to get the workflow from ComfyUI?</a></li>
+<li><a href="#bring-your-own-models-and-nodes">Bring Your Own Models and Nodes</a>
+<ul>
+<li><a href="#network-volume">Network Volume</a></li>
+<li><a href="#custom-docker-image">Custom Docker Image</a></li>
+</ul>
+</li>
+<li><a href="#local-testing">Local testing</a>
+<ul>
+<li><a href="#setup">Setup</a>
+<ul>
+<li><a href="#setup-for-windows">Setup for Windows</a></li>
+</ul>
+</li>
+<li><a href="#testing-the-runpod-handler">Testing the RunPod handler</a></li>
+<li><a href="#local-api">Local API</a>
+<ul>
+<li><a href="#access-the-local-worker-api">Access the local Worker API</a></li>
+<li><a href="#access-local-comfyui">Access local ComfyUI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#automatically-deploy-to-docker-hub-with-github-actions">Automatically deploy to Docker hub with GitHub Actions</a></li>
+<li><a href="#acknowledgments">Acknowledgments</a></li>
+</ul>
+</li>
+</ul>
+<!-- tocstop -->
+<hr>
+<h2 id="quickstart">Quickstart</h2>
+<ul>
+<li>🐳 Choose one of the three available images for your serverless endpoint:
+<ul>
+<li><code>timpietruskyblibla/runpod-worker-comfy:3.0.0-base</code>: doesn't contain any checkpoints, just a clean ComfyUI</li>
+<li><code>timpietruskyblibla/runpod-worker-comfy:3.0.0-sdxl</code>: contains the checkpoints and VAE for Stable Diffusion XL
+<ul>
+<li>Checkpoint: <a href="https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0">sd_xl_base_1.0.safetensors</a></li>
+<li>VAEs:
+<ul>
+<li><a href="https://huggingface.co/stabilityai/sdxl-vae/">sdxl_vae.safetensors</a></li>
+<li><a href="https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/">sdxl-vae-fp16-fix</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><code>timpietruskyblibla/runpod-worker-comfy:3.0.0-sd3</code>: contains the <a href="https://huggingface.co/stabilityai/stable-diffusion-3-medium">sd3_medium_incl_clips_t5xxlfp8.safetensors</a> checkpoint for Stable Diffusion 3</li>
+</ul>
+</li>
+<li>ℹ️ <a href="#use-the-docker-image-on-runpod">Use the Docker image on RunPod</a></li>
+</ul>
+<h2 id="features">Features</h2>
+<ul>
+<li>Run any <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a> workflow to generate an image</li>
+<li>Provide input images as base64-encoded string</li>
+<li>The generated image is either:
+<ul>
+<li>Returned as base64-encoded string (default)</li>
+<li>Uploaded to AWS S3 (<a href="#upload-image-to-aws-s3">if AWS S3 is configured</a>)</li>
+</ul>
+</li>
+<li>There are three different Docker images to choose from:
+<ul>
+<li><code>timpietruskyblibla/runpod-worker-comfy:3.0.0-base</code>: doesn't contain anything, just a clean ComfyUI</li>
+<li><code>timpietruskyblibla/runpod-worker-comfy:3.0.0-sdxl</code>: contains the checkpoint and VAE for Stable Diffusion XL</li>
+<li><code>timpietruskyblibla/runpod-worker-comfy:3.0.0-sd3</code>: contains the checkpoint for Stable Diffusion 3</li>
+</ul>
+</li>
+<li><a href="#bring-your-own-models">Bring your own models</a></li>
+<li>Based on <a href="https://hub.docker.com/r/nvidia/cuda">Ubuntu + NVIDIA CUDA</a></li>
+</ul>
+<h2 id="config">Config</h2>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>REFRESH_WORKER</code></td>
+<td>When you want to stop the worker after each finished job to have a clean state, see <a href="https://docs.runpod.io/docs/handler-additional-controls#refresh-worker">official documentation</a>.</td>
+<td><code>false</code></td>
+</tr>
+<tr>
+<td><code>COMFY_POLLING_INTERVAL_MS</code></td>
+<td>Time to wait between poll attempts in milliseconds.</td>
+<td><code>250</code></td>
+</tr>
+<tr>
+<td><code>COMFY_POLLING_MAX_RETRIES</code></td>
+<td>Maximum number of poll attempts. This should be increased the longer your workflow is running.</td>
+<td><code>500</code></td>
+</tr>
+<tr>
+<td><code>SERVE_API_LOCALLY</code></td>
+<td>Enable local API server for development and testing. See <a href="#local-testing">#NAME?</a> for more details.</td>
+<td>disabled</td>
+</tr>
+</tbody>
+</table>
+<h3 id="upload-image-to-aws-s3">Upload image to AWS S3</h3>
+<p>This is only needed if you want to upload the generated picture to AWS S3. If you don't configure this, your image will be exported as base64-encoded string.</p>
+<ul>
+<li>Create a bucket in region of your choice in AWS S3 (<code>BUCKET_ENDPOINT_URL</code>)</li>
+<li>Create an IAM that has access rights to AWS S3</li>
+<li>Create an Access-Key (<code>BUCKET_ACCESS_KEY_ID</code> &amp; <code>BUCKET_SECRET_ACCESS_KEY</code>) for that IAM</li>
+<li>Configure these environment variables for your RunPod worker:</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Environment Variable</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BUCKET_ENDPOINT_URL</code></td>
+<td>The endpoint URL of your S3 bucket.</td>
+<td><code>https://&lt;bucket&gt;.s3.&lt;region&gt;.amazonaws.com</code></td>
+</tr>
+<tr>
+<td><code>BUCKET_ACCESS_KEY_ID</code></td>
+<td>Your AWS access key ID for accessing the S3 bucket.</td>
+<td><code>AKIAIOSFODNN7EXAMPLE</code></td>
+</tr>
+<tr>
+<td><code>BUCKET_SECRET_ACCESS_KEY</code></td>
+<td>Your AWS secret access key for accessing the S3 bucket.</td>
+<td><code>wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="use-the-docker-image-on-runpod">Use the Docker image on RunPod</h2>
+<ul>
+<li>Create a <a href="https://runpod.io/console/serverless/user/templates">new template</a> by clicking on <code>New Template</code></li>
+<li>In the dialog, configure:
+<ul>
+<li>Template Name: <code>runpod-worker-comfy</code> (it can be anything you want)</li>
+<li>Template Type: serverless (change template type to &quot;serverless&quot;)</li>
+<li>Container Image: <code>&lt;dockerhub_username&gt;/&lt;repository_name&gt;:tag</code>, in this case: <code>timpietruskyblibla/runpod-worker-comfy:3.0.0-sd3</code> (or <code>-base</code> for a clean image or <code>-sdxl</code> for Stable Diffusion XL)</li>
+<li>Container Registry Credentials: You can leave everything as it is, as this repo is public</li>
+<li>Container Disk: <code>20 GB</code></li>
+<li>(optional) Environment Variables: <a href="#upload-image-to-aws-s3">Configure S3</a>
+<ul>
+<li>Note: You can also not configure it, the images will then stay in the worker. In order to have them stored permanently, <a href="https://github.com/blib-la/runpod-worker-comfy/issues/1">we have to add the network volume</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Click on <code>Save Template</code></li>
+<li>Navigate to <a href="https://www.runpod.io/console/serverless/user/endpoints"><code>Serverless &gt; Endpoints</code></a> and click on <code>New Endpoint</code></li>
+<li>In the dialog, configure:
+<ul>
+<li>Endpoint Name: <code>comfy</code></li>
+<li>Select Template: <code>runpod-worker-comfy</code> (or whatever name you gave your template)</li>
+<li>Active Workers: <code>0</code> (whatever makes sense for you)</li>
+<li>Max Workers: <code>3</code> (whatever makes sense for you)</li>
+<li>Idle Timeout: <code>5</code> (you can leave the default)</li>
+<li>Flash Boot: <code>enabled</code> (doesn't cost more, but provides faster boot of our worker, which is good)</li>
+<li>(optional) Advanced: If you are using a Network Volume, select it under <code>Select Network Volume</code>. Otherwise leave the defaults.</li>
+<li>Select a GPU that has some availability</li>
+<li>GPUs/Worker: <code>1</code></li>
+</ul>
+</li>
+<li>Click <code>deploy</code></li>
+<li>Your endpoint will be created, you can click on it to see the dashboard</li>
+</ul>
+<h2 id="api-specification">API specification</h2>
+<p>The following describes which fields exist when doing requests to the API. We only describe the fields that are sent via <code>input</code> as those are needed by the worker itself. For a full list of fields, please take a look at the <a href="https://docs.runpod.io/docs/serverless-usage">official documentation</a>.</p>
+<h3 id="json-request-body">JSON Request Body</h3>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;input&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;workflow&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span><span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;images&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+      <span class="hljs-punctuation">{</span>
+        <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;example_image_name.png&quot;</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-attr">&quot;image&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;base64_encoded_string&quot;</span>
+      <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h3 id="fields">Fields</h3>
+<table>
+<thead>
+<tr>
+<th>Field Path</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>input</code></td>
+<td>Object</td>
+<td>Yes</td>
+<td>The top-level object containing the request data.</td>
+</tr>
+<tr>
+<td><code>input.workflow</code></td>
+<td>Object</td>
+<td>Yes</td>
+<td>Contains the ComfyUI workflow configuration.</td>
+</tr>
+<tr>
+<td><code>input.images</code></td>
+<td>Array</td>
+<td>No</td>
+<td>An array of images. Each image will be added into the &quot;input&quot;-folder of ComfyUI and can then be used in the workflow by using it's <code>name</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="inputimages">&quot;input.images&quot;</h4>
+<p>An array of images, where each image should have a different name.</p>
+<p>🚨 The request body for a RunPod endpoint is 10 MB for <code>/run</code> and 20 MB for <code>/runsync</code>, so make sure that your input images are not super huge as this will be blocked by RunPod otherwise, see the <a href="https://docs.runpod.io/docs/serverless-endpoint-urls">official documentation</a></p>
+<table>
+<thead>
+<tr>
+<th>Field Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>String</td>
+<td>Yes</td>
+<td>The name of the image. Please use the same name in your workflow to reference the image.</td>
+</tr>
+<tr>
+<td><code>image</code></td>
+<td>String</td>
+<td>Yes</td>
+<td>A base64 encoded string of the image.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="interact-with-your-runpod-api">Interact with your RunPod API</h2>
+<ol>
+<li>
+<p><strong>Generate an API Key</strong>:</p>
+<ul>
+<li>In the <a href="https://www.runpod.io/console/serverless/user/settings">User Settings</a>, click on <code>API Keys</code> and then on the <code>API Key</code> button.</li>
+<li>Save the generated key somewhere safe, as you will not be able to see it again when you navigate away from the page.</li>
+</ul>
+</li>
+<li>
+<p><strong>Use the API Key</strong>:</p>
+<ul>
+<li>Use cURL or any other tool to access the API using the API key and your Endpoint ID:
+<ul>
+<li>Replace <code>&lt;api_key&gt;</code> with your key.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Use your Endpoint</strong>:</p>
+<ul>
+<li>Replace <code>&lt;endpoint_id&gt;</code> with the <a href="https://www.runpod.io/console/serverless">ID of the endpoint</a>. (You can find the endpoint ID by clicking on your endpoint; it is written underneath the name of the endpoint at the top and also part of the URLs shown at the bottom of the first box.)</li>
+</ul>
+</li>
+</ol>
+<p><img src="file:///d:\work\runpod-worker-comfy\assets\my-endpoint-with-endpointID.png" alt="How to find the EndpointID"></p>
+<h3 id="health-status">Health status</h3>
+<pre><code class="language-bash">curl -H <span class="hljs-string">&quot;Authorization: Bearer &lt;api_key&gt;&quot;</span> https://api.runpod.ai/v2/&lt;endpoint_id&gt;/health
+</code></pre>
+<h3 id="generate-an-image">Generate an image</h3>
+<p>You can either create a new job async by using <code>/run</code> or a sync by using <code>/runsync</code>. The example here is using a sync job and waits until the response is delivered.</p>
+<p>The API expects a <a href="#json-request-body">JSON in this form</a>, where <code>workflow</code> is the <a href="#how-to-get-the-workflow-from-comfyui">workflow from ComfyUI, exported as JSON</a> and <code>images</code> is optional.</p>
+<p>Please also take a look at the <a href="./test_input.json">test_input.json</a> to see how the API input should look like.</p>
+<h4 id="example-request-with-curl">Example request with cURL</h4>
+<pre><code class="language-bash">curl -X POST -H <span class="hljs-string">&quot;Authorization: Bearer &lt;api_key&gt;&quot;</span> -H <span class="hljs-string">&quot;Content-Type: application/json&quot;</span> -d <span class="hljs-string">&#x27;{&quot;input&quot;:{&quot;workflow&quot;:{&quot;3&quot;:{&quot;inputs&quot;:{&quot;seed&quot;:1337,&quot;steps&quot;:20,&quot;cfg&quot;:8,&quot;sampler_name&quot;:&quot;euler&quot;,&quot;scheduler&quot;:&quot;normal&quot;,&quot;denoise&quot;:1,&quot;model&quot;:[&quot;4&quot;,0],&quot;positive&quot;:[&quot;6&quot;,0],&quot;negative&quot;:[&quot;7&quot;,0],&quot;latent_image&quot;:[&quot;5&quot;,0]},&quot;class_type&quot;:&quot;KSampler&quot;},&quot;4&quot;:{&quot;inputs&quot;:{&quot;ckpt_name&quot;:&quot;sd_xl_base_1.0.safetensors&quot;},&quot;class_type&quot;:&quot;CheckpointLoaderSimple&quot;},&quot;5&quot;:{&quot;inputs&quot;:{&quot;width&quot;:512,&quot;height&quot;:512,&quot;batch_size&quot;:1},&quot;class_type&quot;:&quot;EmptyLatentImage&quot;},&quot;6&quot;:{&quot;inputs&quot;:{&quot;text&quot;:&quot;beautiful scenery nature glass bottle landscape, purple galaxy bottle,&quot;,&quot;clip&quot;:[&quot;4&quot;,1]},&quot;class_type&quot;:&quot;CLIPTextEncode&quot;},&quot;7&quot;:{&quot;inputs&quot;:{&quot;text&quot;:&quot;text, watermark&quot;,&quot;clip&quot;:[&quot;4&quot;,1]},&quot;class_type&quot;:&quot;CLIPTextEncode&quot;},&quot;8&quot;:{&quot;inputs&quot;:{&quot;samples&quot;:[&quot;3&quot;,0],&quot;vae&quot;:[&quot;4&quot;,2]},&quot;class_type&quot;:&quot;VAEDecode&quot;},&quot;9&quot;:{&quot;inputs&quot;:{&quot;filename_prefix&quot;:&quot;ComfyUI&quot;,&quot;images&quot;:[&quot;8&quot;,0]},&quot;class_type&quot;:&quot;SaveImage&quot;}}}}&#x27;</span> https://api.runpod.ai/v2/&lt;endpoint_id&gt;/runsync
+</code></pre>
+<p>Example response with AWS S3 bucket configuration</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;delayTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2188</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;executionTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2297</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sync-c0cd1eb2-068f-4ecf-a99a-55770fc77391-e1&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;output&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://bucket.s3.region.amazonaws.com/10-23/sync-c0cd1eb2-068f-4ecf-a99a-55770fc77391-e1/c67ad621.png&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;success&quot;</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;COMPLETED&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<p>Example response as base64-encoded image</p>
+<pre><code class="language-json"><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;delayTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2188</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;executionTime&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">2297</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sync-c0cd1eb2-068f-4ecf-a99a-55770fc77391-e1&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;output&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;message&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;base64encodedimage&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;success&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;status&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;COMPLETED&quot;</span>
+<span class="hljs-punctuation">}</span>
+</code></pre>
+<h2 id="how-to-get-the-workflow-from-comfyui">How to get the workflow from ComfyUI?</h2>
+<ul>
+<li>Open ComfyUI in the browser</li>
+<li>Open the <code>Settings</code> (gear icon in the top right of the menu)</li>
+<li>In the dialog that appears configure:
+<ul>
+<li><code>Enable Dev mode Options</code>: enable</li>
+<li>Close the <code>Settings</code></li>
+</ul>
+</li>
+<li>In the menu, click on the <code>Save (API Format)</code> button, which will download a file named <code>workflow_api.json</code></li>
+</ul>
+<p>You can now take the content of this file and put it into your <code>workflow</code> when interacting with the API.</p>
+<h2 id="bring-your-own-models-and-nodes">Bring Your Own Models and Nodes</h2>
+<h3 id="network-volume">Network Volume</h3>
+<p>Using a Network Volume allows you to store and access custom models:</p>
+<ol>
+<li>
+<p><strong>Create a Network Volume</strong>:</p>
+<ul>
+<li>Follow the <a href="https://docs.runpod.io/pods/storage/create-network-volumes">RunPod Network Volumes guide</a> to create a volume.</li>
+</ul>
+</li>
+<li>
+<p><strong>Populate the Volume</strong>:</p>
+<ul>
+<li>Create a temporary GPU instance:
+<ul>
+<li>Navigate to <code>Manage &gt; Storage</code>, click <code>Deploy</code> under the volume, and deploy any GPU or CPU instance.</li>
+<li>Navigate to <code>Manage &gt; Pods</code>. Under the new pod, click <code>Connect</code> to open a shell (either via Jupyter notebook or SSH).</li>
+</ul>
+</li>
+<li>Populate the volume with your models:<pre><code class="language-bash"><span class="hljs-built_in">cd</span> /workspace
+<span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> checkpoints clip clip_vision configs controlnet embeddings loras upscale_models vae; <span class="hljs-keyword">do</span> <span class="hljs-built_in">mkdir</span> -p models/<span class="hljs-variable">$i</span>; <span class="hljs-keyword">done</span>
+wget -O models/checkpoints/sd_xl_turbo_1.0_fp16.safetensors https://huggingface.co/stabilityai/sdxl-turbo/resolve/main/sd_xl_turbo_1.0_fp16.safetensors
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Delete the Temporary GPU Instance</strong>:</p>
+<ul>
+<li>Once populated, <a href="https://docs.runpod.io/docs/pods#terminating-a-pod">terminate the temporary GPU instance</a>.</li>
+</ul>
+</li>
+<li>
+<p><strong>Configure Your Endpoint</strong>:</p>
+<ul>
+<li>Use the Network Volume in your endpoint configuration:
+<ul>
+<li>Either create a new endpoint or update an existing one.</li>
+<li>In the endpoint configuration, under <code>Advanced &gt; Select Network Volume</code>, select your Network Volume.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p>Note: The folders in the Network Volume are automatically available to ComfyUI when the network volume is configured and attached.</p>
+<h3 id="custom-docker-image">Custom Docker Image</h3>
+<p>If you prefer to include your models directly in the Docker image, follow these steps:</p>
+<ol>
+<li>
+<p><strong>Fork the Repository</strong>:</p>
+<ul>
+<li>Fork this repository to your own GitHub account.</li>
+</ul>
+</li>
+<li>
+<p><strong>Add Your Models in the Dockerfile</strong>:</p>
+<ul>
+<li>Edit the <code>Dockerfile</code> to include your models:<pre><code class="language-Dockerfile"><span class="hljs-keyword">RUN</span><span class="language-bash"> wget -O models/checkpoints/sd_xl_base_1.0.safetensors https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_base_1.0.safetensors</span>
+</code></pre>
+</li>
+<li>You can also add custom nodes:<pre><code class="language-Dockerfile"><span class="hljs-keyword">RUN</span><span class="language-bash"> git <span class="hljs-built_in">clone</span> https://github.com/&lt;username&gt;/&lt;custom-node-repo&gt;.git custom_nodes/&lt;custom-node-repo&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Build Your Docker Image</strong>:</p>
+<ul>
+<li>Build the <strong>base</strong> image locally:<pre><code class="language-bash">docker build -t &lt;your_dockerhub_username&gt;/runpod-worker-comfy:dev-base --target base --platform linux/amd64 .
+</code></pre>
+</li>
+<li>Build the <strong>sdxl</strong> image locally:<pre><code class="language-bash">docker build --build-arg MODEL_TYPE=sdxl -t &lt;your_dockerhub_username&gt;/runpod-worker-comfy:dev-sdxl --platform linux/amd64 .
+</code></pre>
+</li>
+<li>Build the <strong>sd3</strong> image locally:<pre><code class="language-bash">docker build --build-arg MODEL_TYPE=sd3 --build-arg HUGGINGFACE_ACCESS_TOKEN=&lt;your-huggingface-token&gt; -t &lt;your_dockerhub_username&gt;/runpod-worker-comfy:dev-sd3 --platform linux/amd64 .
+</code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>Ensure to specify <code>--platform linux/amd64</code> to avoid errors on RunPod, see <a href="https://github.com/blib-la/runpod-worker-comfy/issues/13">issue #13</a>.</p>
+</div>
+<h2 id="local-testing">Local testing</h2>
+<p>Both tests will use the data from <a href="./test_input.json">test_input.json</a>, so make your changes in there to test this properly.</p>
+<h3 id="setup">Setup</h3>
+<ol>
+<li>Make sure you have Python &gt;= 3.10</li>
+<li>Create a virtual environment:<pre><code class="language-bash">python -m venv venv
+</code></pre>
+</li>
+<li>Activate the virtual environment:
+<ul>
+<li><strong>Windows</strong>:<pre><code class="language-bash">.\venv\Scripts\activate
+</code></pre>
+</li>
+<li><strong>Mac / Linux</strong>:<pre><code class="language-bash"><span class="hljs-built_in">source</span> ./venv/bin/activate
+</code></pre>
+</li>
+</ul>
+</li>
+<li>Install the dependencies:<pre><code class="language-bash">pip install -r requirements.txt
+</code></pre>
+</li>
+</ol>
+<h4 id="setup-for-windows">Setup for Windows</h4>
+<ol>
+<li>Install WSL2 and a Linux distro (like Ubuntu) following <a href="https://ubuntu.com/tutorials/install-ubuntu-on-wsl2-on-windows-11-with-gui-support#1-overview">this guide</a>. You can skip the &quot;Install and use a GUI package&quot; part.</li>
+<li>After installing Ubuntu, open the terminal and log in:<pre><code class="language-bash">wsl -d Ubuntu
+</code></pre>
+</li>
+<li>Update the packages:<pre><code class="language-bash">sudo apt update
+</code></pre>
+</li>
+<li>Install Docker in Ubuntu:
+<ul>
+<li>Follow the <a href="https://docs.docker.com/engine/install/ubuntu/">official Docker installation guide</a>.</li>
+<li>Install docker-compose:<pre><code class="language-bash">sudo apt-get install docker-compose
+</code></pre>
+</li>
+<li>Install the NVIDIA Toolkit in Ubuntu:
+Follow <a href="https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#configuring-docker">this guide</a> and create the <code>nvidia</code> runtime.</li>
+</ul>
+</li>
+<li>Enable GPU acceleration on Ubuntu on WSL2:
+Follow <a href="https://canonical-ubuntu-wsl.readthedocs-hosted.com/en/latest/tutorials/gpu-cuda/">this guide</a>.
+<ul>
+<li>If you already have your GPU driver installed on Windows, you can skip the &quot;Install the appropriate Windows vGPU driver for WSL&quot; step.</li>
+</ul>
+</li>
+<li>Add your user to the <code>docker</code> group to use Docker without <code>sudo</code>:<pre><code class="language-bash">sudo usermod -aG docker <span class="hljs-variable">$USER</span>
+</code></pre>
+</li>
+</ol>
+<p>Once these steps are completed, switch to Ubuntu in the terminal and run the Docker image locally on your Windows computer via WSL:</p>
+<pre><code class="language-bash">wsl -d Ubuntu
+</code></pre>
+<h3 id="testing-the-runpod-handler">Testing the RunPod handler</h3>
+<ul>
+<li>Run all tests: <code>python -m unittest discover</code></li>
+<li>If you want to run a specific test: <code>python -m unittest tests.test_rp_handler.TestRunpodWorkerComfy.test_bucket_endpoint_not_configured</code></li>
+</ul>
+<p>You can also start the handler itself to have the local server running: <code>python src/rp_handler.py</code>
+To get this to work you will also need to start &quot;ComfyUI&quot;, otherwise the handler will not work.</p>
+<h3 id="local-api">Local API</h3>
+<p>For enhanced local development, you can start an API server that simulates the RunPod worker environment. This feature is particularly useful for debugging and testing your integrations locally.</p>
+<p>Set the <code>SERVE_API_LOCALLY</code> environment variable to <code>true</code> to activate the local API server when running your Docker container. This is already the default value in the <code>docker-compose.yml</code>, so you can get it running by executing:</p>
+<pre><code class="language-bash">docker-compose up
+</code></pre>
+<h4 id="access-the-local-worker-api">Access the local Worker API</h4>
+<ul>
+<li>With the local API server running, it's accessible at: <a href="http://localhost:8000">localhost:8000</a></li>
+<li>When you open this in your browser, you can also see the API documentation and can interact with the API directly</li>
+</ul>
+<h4 id="access-local-comfyui">Access local ComfyUI</h4>
+<ul>
+<li>With the local API server running, you can access ComfyUI at: <a href="http://localhost:8188">localhost:8188</a></li>
+</ul>
+<h2 id="automatically-deploy-to-docker-hub-with-github-actions">Automatically deploy to Docker hub with GitHub Actions</h2>
+<p>The repo contains two workflows that publish the image to Docker hub using GitHub Actions:</p>
+<ul>
+<li><a href=".github/workflows/dev.yml">dev.yml</a>: Creates the image and pushes it to Docker hub with the <code>dev</code> tag on every push to the <code>main</code> branch</li>
+<li><a href=".github/workflows/release.yml">release.yml</a>: Creates the image and pushes it to Docker hub with the <code>latest</code> and the release tag. It will only be triggered when you create a release on GitHub</li>
+</ul>
+<p>If you want to use this, you should add these <strong>secrets</strong> to your repository:</p>
+<table>
+<thead>
+<tr>
+<th>Configuration Variable</th>
+<th>Description</th>
+<th>Example Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DOCKERHUB_USERNAME</code></td>
+<td>Your Docker Hub username.</td>
+<td><code>your-username</code></td>
+</tr>
+<tr>
+<td><code>DOCKERHUB_TOKEN</code></td>
+<td>Your Docker Hub token for authentication.</td>
+<td><code>your-token</code></td>
+</tr>
+<tr>
+<td><code>HUGGINGFACE_ACCESS_TOKEN</code></td>
+<td>Your READ access token from Hugging Face</td>
+<td><code>your-access-token</code></td>
+</tr>
+</tbody>
+</table>
+<p>And also make sure to add these <strong>variables</strong> to your repository:</p>
+<table>
+<thead>
+<tr>
+<th>Variable Name</th>
+<th>Description</th>
+<th>Example Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DOCKERHUB_REPO</code></td>
+<td>The repository on Docker Hub where the image will be pushed.</td>
+<td><code>timpietruskyblibla</code></td>
+</tr>
+<tr>
+<td><code>DOCKERHUB_IMG</code></td>
+<td>The name of the image to be pushed to Docker Hub.</td>
+<td><code>runpod-worker-comfy</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="acknowledgments">Acknowledgments</h2>
+<ul>
+<li>Thanks to <a href="https://github.com/blib-la/runpod-worker-comfy/graphs/contributors">all contributors</a> for your awesome work</li>
+<li>Thanks to <a href="https://github.com/justinmerrell">Justin Merrell</a> from RunPod for <a href="https://github.com/runpod-workers/worker-a1111">worker-1111</a>, which was used to get inspired on how to create this worker</li>
+<li>Thanks to <a href="https://github.com/ashleykleynhans">Ashley Kleynhans</a> for <a href="https://github.com/ashleykleynhans/runpod-worker-a1111">runpod-worker-a1111</a>, which was used to get inspired on how to create this worker</li>
+<li>Thanks to <a href="https://github.com/comfyanonymous">comfyanonymous</a> for creating <a href="https://github.com/comfyanonymous/ComfyUI">ComfyUI</a>, which provides such an awesome API to interact with Stable Diffusion</li>
+</ul>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
