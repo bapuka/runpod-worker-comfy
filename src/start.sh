@@ -8,7 +8,7 @@ export HF_HOME="/"
 
 # Debug: List directory structure to help diagnose path issues
 echo "runpod-worker-comfy: Listing root directory structure"
-ls -la /
+ls -la /ComfyUI
 echo "runpod-worker-comfy: Listing workflows directory"
 ls -la /workflows
 
