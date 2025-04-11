@@ -29,7 +29,7 @@ pip3 install -r requirements.txt
 
 cd /ComfyUI
 git clone https://github.com/ntdviet/comfyui-ext.git custom_nodes/comfyui-ext
-cp custom_nodes/comfyui-ext/custom_nodes/gcLatentTunnel/gcLatentTunnel.py .
+cp custom_nodes/comfyui-ext/custom_nodes/gcLatentTunnel/gcLatentTunnel.py ./custom_nodes/gcLatentTunnel.py
 rm -rf custom_nodes/comfyui-ext
 
 cd /ComfyUI
