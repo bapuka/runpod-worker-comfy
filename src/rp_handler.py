@@ -150,8 +150,29 @@ def check_server(url, retries=500, delay=50):
     return False
 
 def get_workflow_payload(workflow_name, payload, image_names=None):
-    with open(f'./workflows/{workflow_name}.json', 'r') as json_file:
-        workflow = json.load(json_file)
+    # Try multiple possible locations for the workflow file
+    possible_paths = [
+        f'./workflows/{workflow_name}.json',
+        f'/workflows/{workflow_name}.json',
+        f'./src/workflows/{workflow_name}.json',
+        f'/src/workflows/{workflow_name}.json'
+    ]
+    
+    workflow_file = None
+    for path in possible_paths:
+        try:
+            rp_logger.info(f'Trying to open workflow file at: {path}')
+            with open(path, 'r') as json_file:
+                workflow = json.load(json_file)
+                rp_logger.info(f'Successfully loaded workflow from: {path}')
+                workflow_file = path
+                break
+        except FileNotFoundError:
+            rp_logger.info(f'Workflow file not found at: {path}')
+            continue
+    
+    if workflow_file is None:
+        raise FileNotFoundError(f"Could not find workflow file for: {workflow_name}. Tried paths: {possible_paths}")
 
     if workflow_name == 'img2imgPersona':
         workflow = get_img2imgPersona_payload(workflow, payload, image_names)
@@ -457,6 +478,19 @@ if __name__ == "__main__":
 
     # Set up RunPod logger
     rp_logger.set_level(LOG_LEVEL)
+    
+    # Debug: Print current directory and check if workflows directory exists
+    import os
+    rp_logger.info(f'Current working directory: {os.getcwd()}')
+    rp_logger.info(f'Workflows directory exists: {os.path.exists("./workflows")}')
+    rp_logger.info(f'Src/workflows directory exists: {os.path.exists("./src/workflows")}')
+    
+    # List files in current directory
+    rp_logger.info(f'Files in current directory: {os.listdir(".")}')
+    
+    # Try to list files in workflows directory if it exists
+    if os.path.exists("./workflows"):
+        rp_logger.info(f'Files in workflows directory: {os.listdir("./workflows")}')
 
     wait_for_service(url=f'{BASE_URI}/system_stats')
     rp_logger.info('ComfyUI API is ready')
