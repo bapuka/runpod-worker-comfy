@@ -482,15 +482,15 @@ if __name__ == "__main__":
     # Debug: Print current directory and check if workflows directory exists
     import os
     rp_logger.info(f'Current working directory: {os.getcwd()}')
-    rp_logger.info(f'Workflows directory exists: {os.path.exists("./workflows")}')
-    rp_logger.info(f'Src/workflows directory exists: {os.path.exists("./src/workflows")}')
+    rp_logger.info(f'Workflows directory exists: {os.path.exists("/workflows")}')
+    rp_logger.info(f'Src/workflows directory exists: {os.path.exists("/src/workflows")}')
     
     # List files in current directory
     rp_logger.info(f'Files in current directory: {os.listdir(".")}')
     
     # Try to list files in workflows directory if it exists
-    if os.path.exists("./workflows"):
-        rp_logger.info(f'Files in workflows directory: {os.listdir("./workflows")}')
+    if os.path.exists("/workflows"):
+        rp_logger.info(f'Files in workflows directory: {os.listdir("/workflows")}')
 
     wait_for_service(url=f'{BASE_URI}/system_stats')
     rp_logger.info('ComfyUI API is ready')
