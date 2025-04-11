@@ -52,7 +52,9 @@ WORKDIR /
 # COPY --chmod=755 scripts/* ./
 
 # Copy runpod scripts
-ADD src/start.sh src/rp_handler.py src/schemas src/workflows ./
+COPY src/schemas ./schemas
+COPY src/workflows ./workflows
+ADD src/start.sh src/rp_handler.py ./
 RUN chmod +x /start.sh
 
 # Start the container
