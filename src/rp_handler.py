@@ -411,7 +411,7 @@ def handler(event):
 
                     for image_filename in image_filenames:
                         filename = image_filename['filename']
-                        image_path = f'{VOLUME_MOUNT_PATH}/ComfyUI/output/{filename}'
+                        image_path = f'/ComfyUI/output/{filename}'
 
                         with open(image_path, 'rb') as image_file:
                             images.append(base64.b64encode(image_file.read()).decode('utf-8'))
