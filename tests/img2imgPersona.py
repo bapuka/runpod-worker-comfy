@@ -12,7 +12,7 @@ if __name__ == '__main__':
                 "cfg_scale": 5,
                 "sampler_name": "dpm_2",
                 "scheduler": "karras",
-                "ckpt_name": "sdxl/CHEYENNE_v20.safetensors",
+                "ckpt_name": "CHEYENNE_v20.safetensors",
                 "batch_size": 4,
                 "width": 824,
                 "height": 1168,
