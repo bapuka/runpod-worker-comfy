@@ -250,7 +250,7 @@ def is_webp_base64(base64_string):
 
 def convert_webp_to_png(webp_data):
     """
-    Convert WebP image data to PNG format.
+    Convert WebP image data to PNG format with robust handling of different image modes.
     
     Args:
         webp_data (bytes): The WebP image data
@@ -261,6 +261,20 @@ def convert_webp_to_png(webp_data):
     try:
         # Open the WebP image using PIL
         img = Image.open(BytesIO(webp_data))
+        
+        # Handle transparency in WebP images
+        if img.mode == 'RGBA' or img.mode == 'LA':
+            # Create a white background
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            # Paste the image on the background, using alpha as mask
+            if 'A' in img.mode:
+                background.paste(img, mask=img.split()[img.mode.find('A')])
+                img = background
+            else:
+                img = img.convert('RGB')
+        elif img.mode != 'RGB':
+            # Convert other modes to RGB
+            img = img.convert('RGB')
         
         # Convert to PNG
         output = BytesIO()
@@ -306,11 +320,14 @@ def upload_images(images):
 
     responses = []
     upload_errors = []
+    # Track the updated filenames during the upload process
+    updated_filenames = []
 
     print(f"runpod-worker-comfy - image(s) upload")
 
     for image in images:
-        name = image["name"]
+        original_name = image["name"]
+        name = original_name  # Start with the original name
         image_data = image["image"]
         
         # Strip MIME type prefix if present (e.g., "data:image/webp;base64,")
@@ -334,14 +351,19 @@ def upload_images(images):
             upload_errors.append(f"Invalid image data for {name}")
             continue
         
-        # Convert all images to PNG to ensure compatibility
-        # This ensures even if WebP detection fails, we still get a valid PNG
+        # Convert images to PNG to ensure compatibility
         try:
-            print(f"runpod-worker-comfy - converting image to PNG: {name}")
-            img = Image.open(BytesIO(blob))
-            output = BytesIO()
-            img.save(output, format='PNG')
-            blob = output.getvalue()
+            if is_webp:
+                print(f"runpod-worker-comfy - detected WebP image, converting to PNG: {name}")
+                # Use our specialized WebP to PNG conversion for WebP images
+                blob = convert_webp_to_png(blob)
+            else:
+                # For non-WebP images, use standard conversion
+                print(f"runpod-worker-comfy - converting image to PNG: {name}")
+                img = Image.open(BytesIO(blob))
+                output = BytesIO()
+                img.save(output, format='PNG')
+                blob = output.getvalue()
             
             # Update the file extension if it's not already PNG
             if not name.lower().endswith('.png'):
@@ -350,8 +372,12 @@ def upload_images(images):
                     name = name.rsplit('.', 1)[0]
                 name = name + '.png'
                 
-            if is_webp:
-                print(f"runpod-worker-comfy - detected and converted WebP image: {name}")
+            # Verify the converted image is valid
+            if is_valid_image(blob):
+                print(f"runpod-worker-comfy - image successfully converted: {name}")
+            else:
+                raise Exception("Converted image is not valid")
+                
         except Exception as e:
             rp_logger.error(f"Error converting image to PNG: {str(e)}")
             # If conversion fails, we'll try to use the original image
@@ -367,16 +393,25 @@ def upload_images(images):
         response = requests.post(f"http://{COMFY_HOST}/upload/image", files=files)
         if response.status_code != 200:
             upload_errors.append(f"Error uploading {name}: {response.text}")
+            # Add the original name to the updated filenames list for consistency
+            updated_filenames.append(original_name)
         else:
             rp_logger.info(f"Image uploaded successfully: {name}")
             responses.append(f"Successfully uploaded {name}")
-
+            # Add the updated name to the list
+            updated_filenames.append(name)
+    
+    # Log the updated filenames for debugging
+    rp_logger.info(f"Original filenames: {[img['name'] for img in images]}")
+    rp_logger.info(f"Updated filenames: {updated_filenames}")
+    
     if upload_errors:
         print(f"runpod-worker-comfy - image(s) upload with errors")
         return {
             "status": "error",
             "message": "Some images failed to upload",
             "details": upload_errors,
+            "updated_filenames": updated_filenames  # Include even on error for partial success
         }
 
     print(f"runpod-worker-comfy - image(s) upload complete")
@@ -384,6 +419,7 @@ def upload_images(images):
         "status": "success",
         "message": "All images uploaded successfully",
         "details": responses,
+        "updated_filenames": updated_filenames  # Include the updated filenames
     }
 
 
@@ -471,23 +507,11 @@ def handler(event):
         workflow = validated_data["workflow"]
         payload = validated_data['payload']
         images = validated_data['images'] if 'images' in validated_data else []
-        # rp_logger.info(f'Validated input: {images}', job_id)
-        image_names = []
-        for image in images:
-            name = image["name"]
-            image_names.append(name)
         
         if workflow == 'default':
             workflow = 'txt2img'
         
         rp_logger.info(f'Workflow: {workflow}', job_id)
-        
-        if workflow == 'img2imgPersona':
-            try:
-                payload = get_workflow_payload(workflow, payload, image_names)
-            except Exception as e:
-                rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
-                raise
 
         # Make sure that the ComfyUI API is available
         check_server(
@@ -496,11 +520,33 @@ def handler(event):
             COMFY_API_AVAILABLE_INTERVAL_MS,
         )
 
-        # Upload images if they exist
+        # Upload images if they exist and track the updated filenames
         upload_result = upload_images(images)
-
         if upload_result["status"] == "error":
             return upload_result
+        
+        # Get the updated image names (which may have changed from .webp to .png)
+        updated_image_names = []
+        if "updated_filenames" in upload_result:
+            updated_image_names = upload_result["updated_filenames"]
+        else:
+            # Fallback if updated filenames aren't provided
+            for image in images:
+                name = image["name"]
+                # Ensure .webp extensions are changed to .png
+                if name.lower().endswith('.webp'):
+                    name = name[:-5] + '.png'
+                updated_image_names.append(name)
+        
+        rp_logger.info(f'Updated image names: {updated_image_names}', job_id)
+        
+        # Now get the workflow payload with the updated image names
+        if workflow == 'img2imgPersona':
+            try:
+                payload = get_workflow_payload(workflow, payload, updated_image_names)
+            except Exception as e:
+                rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
+                raise
 
         queue_response = send_post_request(
             'prompt',
