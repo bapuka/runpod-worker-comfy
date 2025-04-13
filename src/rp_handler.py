@@ -27,7 +27,7 @@ COMFY_POLLING_INTERVAL_MS = os.environ.get("COMFY_POLLING_INTERVAL_MS", 250)
 # Maximum number of poll attempts
 COMFY_POLLING_MAX_RETRIES = os.environ.get("COMFY_POLLING_MAX_RETRIES", 500)
 # Host where ComfyUI is running
-COMFY_HOST = "127.0.0.1:8188"
+COMFY_HOST = "127.0.0.1:3001"
 # Enforce a clean state after each job is done
 # see https://docs.runpod.io/docs/handler-additional-controls#refresh-worker
 REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
@@ -219,13 +219,33 @@ def is_webp_base64(base64_string):
     Returns:
         bool: True if the image is WebP, False otherwise
     """
-    # WebP images start with "RIFF" header followed by file size and "WEBP" identifier
-    # In base64, this pattern can be detected at the beginning of the string
     try:
-        # Decode a small portion of the base64 string to check the header
-        header = base64.b64decode(base64_string[:32])
-        return header.startswith(b'RIFF') and b'WEBP' in header[:16]
-    except:
+        # Decode the base64 string
+        image_data = base64.b64decode(base64_string)
+        
+        # Method 1: Check for WebP signature in header
+        # WebP files start with "RIFF" followed by file size and "WEBP"
+        if len(image_data) >= 12:
+            if image_data.startswith(b'RIFF') and b'WEBP' in image_data[0:12]:
+                return True
+        
+        # Method 2: Try to open with PIL and check format
+        try:
+            with Image.open(BytesIO(image_data)) as img:
+                return img.format == 'WEBP'
+        except:
+            pass
+            
+        # Method 3: Check file extension in MIME type if available
+        # This would be in the base64 string metadata if present
+        if ',' in base64_string and ';base64,' in base64_string:
+            mime_part = base64_string.split(';base64,')[0]
+            if 'webp' in mime_part.lower():
+                return True
+                
+        return False
+    except Exception as e:
+        rp_logger.error(f"Error in is_webp_base64: {str(e)}")
         return False
 
 def convert_webp_to_png(webp_data):
@@ -254,7 +274,7 @@ def convert_webp_to_png(webp_data):
 def upload_images(images):
     """
     Upload a list of base64 encoded images to the ComfyUI server using the /upload/image endpoint.
-    Automatically converts WebP images to PNG format.
+    Automatically converts all images to PNG format to ensure compatibility with ComfyUI.
 
     Args:
         images (list): A list of dictionaries, each containing the 'name' of the image and the 'image' as a base64 encoded string.
@@ -278,14 +298,31 @@ def upload_images(images):
         # Decode the base64 image
         blob = base64.b64decode(image_data)
         
-        # Check if the image is WebP and convert if necessary
-        if is_webp_base64(image_data):
-            print(f"runpod-worker-comfy - converting WebP image to PNG: {name}")
-            blob = convert_webp_to_png(blob)
+        # Check if the image is WebP
+        is_webp = is_webp_base64(image_data)
+        
+        # Convert all images to PNG to ensure compatibility
+        # This ensures even if WebP detection fails, we still get a valid PNG
+        try:
+            print(f"runpod-worker-comfy - converting image to PNG: {name}")
+            img = Image.open(BytesIO(blob))
+            output = BytesIO()
+            img.save(output, format='PNG')
+            blob = output.getvalue()
             
-            # Update the file extension if it ends with .webp
-            if name.lower().endswith('.webp'):
-                name = name[:-5] + '.png'
+            # Update the file extension if it's not already PNG
+            if not name.lower().endswith('.png'):
+                # Remove old extension if present
+                if '.' in name:
+                    name = name.rsplit('.', 1)[0]
+                name = name + '.png'
+                
+            if is_webp:
+                print(f"runpod-worker-comfy - detected and converted WebP image: {name}")
+        except Exception as e:
+            rp_logger.error(f"Error converting image to PNG: {str(e)}")
+            # If conversion fails, we'll try to use the original image
+            print(f"runpod-worker-comfy - conversion failed, using original image: {name}")
 
         # Prepare the form data
         files = {
