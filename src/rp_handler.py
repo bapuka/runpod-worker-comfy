@@ -32,7 +32,7 @@ COMFY_HOST = "127.0.0.1:8188"
 # see https://docs.runpod.io/docs/handler-additional-controls#refresh-worker
 REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
 
-BASE_URI = 'http://{COMFY_HOST}'
+BASE_URI = f'http://{COMFY_HOST}'
 VOLUME_MOUNT_PATH = '/runpod-volume'
 LOG_FILE= 'comfyui-worker.log'
 LOG_LEVEL = 'INFO'
