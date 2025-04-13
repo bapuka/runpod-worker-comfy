@@ -271,6 +271,24 @@ def convert_webp_to_png(webp_data):
         # Return original data if conversion fails
         return webp_data
 
+def is_valid_image(image_data):
+    """
+    Check if the data is a valid image that can be opened by PIL.
+    
+    Args:
+        image_data (bytes): The image data to check
+        
+    Returns:
+        bool: True if the data is a valid image, False otherwise
+    """
+    try:
+        with Image.open(BytesIO(image_data)) as img:
+            # Try to load the image data - this will fail if it's not a valid image
+            img.load()
+            return True
+    except Exception:
+        return False
+
 def upload_images(images):
     """
     Upload a list of base64 encoded images to the ComfyUI server using the /upload/image endpoint.
@@ -295,11 +313,26 @@ def upload_images(images):
         name = image["name"]
         image_data = image["image"]
         
+        # Strip MIME type prefix if present (e.g., "data:image/webp;base64,")
+        if ';base64,' in image_data:
+            image_data = image_data.split(';base64,', 1)[1]
+        
         # Decode the base64 image
-        blob = base64.b64decode(image_data)
+        try:
+            blob = base64.b64decode(image_data)
+        except Exception as e:
+            rp_logger.error(f"Error decoding base64 image: {str(e)}")
+            upload_errors.append(f"Error decoding base64 image {name}: {str(e)}")
+            continue
         
         # Check if the image is WebP
         is_webp = is_webp_base64(image_data)
+        
+        # Verify this is actually a valid image before trying to convert
+        if not is_valid_image(blob):
+            rp_logger.error(f"Invalid image data for {name}")
+            upload_errors.append(f"Invalid image data for {name}")
+            continue
         
         # Convert all images to PNG to ensure compatibility
         # This ensures even if WebP detection fails, we still get a valid PNG
