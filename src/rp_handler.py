@@ -27,12 +27,12 @@ COMFY_POLLING_INTERVAL_MS = os.environ.get("COMFY_POLLING_INTERVAL_MS", 250)
 # Maximum number of poll attempts
 COMFY_POLLING_MAX_RETRIES = os.environ.get("COMFY_POLLING_MAX_RETRIES", 500)
 # Host where ComfyUI is running
-COMFY_HOST = "127.0.0.1:3001"
+COMFY_HOST = "127.0.0.1:8000"
 # Enforce a clean state after each job is done
 # see https://docs.runpod.io/docs/handler-additional-controls#refresh-worker
 REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
 
-BASE_URI = 'http://127.0.0.1:3001'
+BASE_URI = 'http://{COMFY_HOST}'
 VOLUME_MOUNT_PATH = '/runpod-volume'
 LOG_FILE= 'comfyui-worker.log'
 LOG_LEVEL = 'INFO'
