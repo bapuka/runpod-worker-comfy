@@ -15,6 +15,8 @@ import os
 import requests
 import base64
 from io import BytesIO
+from PIL import Image
+import re
 
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
@@ -204,9 +206,52 @@ def get_img2imgPersona_payload(workflow, payload, image_names):
     return workflow
 
 
+def is_webp_base64(base64_string):
+    """
+    Check if a base64 string represents a WebP image.
+    
+    Args:
+        base64_string (str): The base64 encoded image string
+        
+    Returns:
+        bool: True if the image is WebP, False otherwise
+    """
+    # WebP images start with "RIFF" header followed by file size and "WEBP" identifier
+    # In base64, this pattern can be detected at the beginning of the string
+    try:
+        # Decode a small portion of the base64 string to check the header
+        header = base64.b64decode(base64_string[:32])
+        return header.startswith(b'RIFF') and b'WEBP' in header[:16]
+    except:
+        return False
+
+def convert_webp_to_png(webp_data):
+    """
+    Convert WebP image data to PNG format.
+    
+    Args:
+        webp_data (bytes): The WebP image data
+        
+    Returns:
+        bytes: The converted PNG image data
+    """
+    try:
+        # Open the WebP image using PIL
+        img = Image.open(BytesIO(webp_data))
+        
+        # Convert to PNG
+        output = BytesIO()
+        img.save(output, format='PNG')
+        return output.getvalue()
+    except Exception as e:
+        rp_logger.error(f"Error converting WebP to PNG: {str(e)}")
+        # Return original data if conversion fails
+        return webp_data
+
 def upload_images(images):
     """
     Upload a list of base64 encoded images to the ComfyUI server using the /upload/image endpoint.
+    Automatically converts WebP images to PNG format.
 
     Args:
         images (list): A list of dictionaries, each containing the 'name' of the image and the 'image' as a base64 encoded string.
@@ -226,7 +271,18 @@ def upload_images(images):
     for image in images:
         name = image["name"]
         image_data = image["image"]
+        
+        # Decode the base64 image
         blob = base64.b64decode(image_data)
+        
+        # Check if the image is WebP and convert if necessary
+        if is_webp_base64(image_data):
+            print(f"runpod-worker-comfy - converting WebP image to PNG: {name}")
+            blob = convert_webp_to_png(blob)
+            
+            # Update the file extension if it ends with .webp
+            if name.lower().endswith('.webp'):
+                name = name[:-5] + '.png'
 
         # Prepare the form data
         files = {
@@ -239,6 +295,7 @@ def upload_images(images):
         if response.status_code != 200:
             upload_errors.append(f"Error uploading {name}: {response.text}")
         else:
+            rp_logger.info(f"Image uploaded successfully: {name}")
             responses.append(f"Successfully uploaded {name}")
 
     if upload_errors:
@@ -341,7 +398,7 @@ def handler(event):
         workflow = validated_data["workflow"]
         payload = validated_data['payload']
         images = validated_data['images'] if 'images' in validated_data else []
-        rp_logger.info(f'Validated input: {images}', job_id)
+        # rp_logger.info(f'Validated input: {images}', job_id)
         image_names = []
         for image in images:
             name = image["name"]
