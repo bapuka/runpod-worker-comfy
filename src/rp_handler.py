@@ -69,7 +69,7 @@ def wait_for_service(url):
 
             # Only log every 15 retries so the logs don't get spammed
             if retries % 15 == 0:
-                rp_logger.info('Service not ready yet. Retrying...')
+                rp_logger.info('Service not ready yet. Retrying...', url)
         except Exception as err:
             rp_logger.error(f'Error: {err}')
 
