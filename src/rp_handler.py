@@ -155,7 +155,9 @@ def get_workflow_payload(workflow_name, payload, image_names=None):
     # Try multiple possible locations for the workflow file
     possible_paths = [        
         f'/workflows/{workflow_name}.json', 
-        f'/src/workflows/{workflow_name}.json',       
+        f'/src/workflows/{workflow_name}.json',     
+        f'./workflows/{workflow_name}.json',
+        f'./src/workflows/{workflow_name}.json',  
     ]
     
     workflow_file = None
