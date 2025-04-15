@@ -588,9 +588,17 @@ def handler(event):
                     for image_filename in image_filenames:
                         filename = image_filename['filename']
                         image_path = f'/ComfyUI/output/{filename}'
-
-                        with open(image_path, 'rb') as image_file:
-                            images.append(base64.b64encode(image_file.read()).decode('utf-8'))
+                                                
+                        with Image.open(image_path) as img:
+                            width, height = img.size
+                            rp_logger.info(f"The image size is: {img.size}")
+                            rp_logger.info(f"The image resolution is: {width}x{height}")
+                            output = BytesIO()
+                            img.save(output, format='PNG')
+                            images.append(base64.b64encode(output.getvalue()))
+                            
+                        # with open(image_path, 'rb') as image_file:                            
+                        #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
 
                         rp_logger.info(f'Deleting output file: {image_path}', job_id)
                         os.remove(image_path)
