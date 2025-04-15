@@ -600,8 +600,8 @@ def handler(event):
                         # with open(image_path, 'rb') as image_file:                            
                         #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
 
-                        rp_logger.info(f'Deleting output file: {image_path}', job_id)
-                        os.remove(image_path)
+                        # rp_logger.info(f'Deleting output file: {image_path}', job_id)
+                        # os.remove(image_path)
 
                     return {
                         'images': images
