@@ -71,3 +71,6 @@ else
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u /rp_handler.py
 fi
+
+echo "Start script(s) finished, pod is ready to use."
+sleep infinity
