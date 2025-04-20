@@ -589,6 +589,7 @@ def handler(event):
                     for image_filename in image_filenames:
                         filename = image_filename['filename']
                         image_path = f'/ComfyUI/output/{filename}'
+                        rp_logger.info(f'Image path: {image_path}', job_id)
                                                 
                         with Image.open(image_path) as img:
                             # width, height = img.size
@@ -597,7 +598,7 @@ def handler(event):
                             output = BytesIO()
                             img.save(output, format='PNG')
                             images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
-                            
+                            output.close()
                         # with open(image_path, 'rb') as image_file:                            
                         #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
 
