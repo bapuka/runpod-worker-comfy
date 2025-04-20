@@ -554,6 +554,7 @@ def handler(event):
                 'prompt': payload
             }
         )
+        rp_logger.info(f'Prompt: {payload}', job_id)
         
         if queue_response.status_code == 200:
             resp_json = queue_response.json()
@@ -590,9 +591,9 @@ def handler(event):
                         image_path = f'/ComfyUI/output/{filename}'
                                                 
                         with Image.open(image_path) as img:
-                            width, height = img.size
+                            # width, height = img.size
                             rp_logger.info(f"The image size is: {img.size}")
-                            rp_logger.info(f"The image resolution is: {width}x{height}")
+                            # rp_logger.info(f"The image resolution is: {width}x{height}")
                             output = BytesIO()
                             img.save(output, format='PNG')
                             images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
