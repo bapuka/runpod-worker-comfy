@@ -285,7 +285,7 @@ def get_img2imgPersona_payload(workflow, payload, image_names, prefix):
     workflow["190"]["inputs"]["image"] = image_names[0]
     workflow["174"]["inputs"]["text"] = payload["prompt"]
     workflow["176"]["inputs"]["text"] = payload["negative_prompt"]
-    workflow["193"]["inputs"]["prefix"] = prefix
+    workflow["193"]["inputs"]["filename_prefix"] = prefix
     return workflow
 
 
@@ -733,12 +733,12 @@ def handler(event):
                                                 
                         with Image.open(image_path) as img:
                             # width, height = img.size
-                            rp_logger.info(f"The image size is: {img.size}")
+                            # rp_logger.info(f"The image size is: {img.size}")
                             # rp_logger.info(f"The image resolution is: {width}x{height}")
                             output = BytesIO()
                             img.save(output, format='PNG')
                             images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
-                            output.close()
+                            # output.close()
                         # with open(image_path, 'rb') as image_file:                            
                         #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
 
