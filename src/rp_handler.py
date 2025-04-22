@@ -230,7 +230,7 @@ def check_server(url, retries=500, delay=50):
     )
     return False
 
-def get_workflow_payload(workflow_name, payload, image_names=None, job_id):
+def get_workflow_payload(workflow_name, payload, image_names=None, job_id=None):
     # Try multiple possible locations for the workflow file
     possible_paths = [        
         f'/workflows/{workflow_name}.json', 
