@@ -37,11 +37,85 @@ REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
 # Structure: {batchId: {"original_name": "updated_name"}}
 batch_uploaded_images = defaultdict(dict)
 
+# Dictionary to track active batch processing
+# Structure: {batchId: {"status": "processing|completed", "last_activity": timestamp, "prompt_ids": [list of prompt_ids]}}
+active_batches = {}
+
+# Time in seconds after which a batch is considered inactive (default: 10 minutes)
+BATCH_TIMEOUT = 600
+
 BASE_URI = f'http://{COMFY_HOST}'
 VOLUME_MOUNT_PATH = '/runpod-volume'
 LOG_FILE= 'comfyui-worker.log'
 LOG_LEVEL = 'INFO'
 TIMEOUT = 600
+
+def is_batch_active(batch_id):
+    """
+    Check if a batch is currently active and not timed out.
+    
+    Args:
+        batch_id (str): The batch ID to check
+        
+    Returns:
+        bool: True if the batch is active, False otherwise
+    """
+    if not batch_id or batch_id not in active_batches:
+        return False
+        
+    batch_info = active_batches[batch_id]
+    current_time = time.time()
+    
+    # Check if the batch has timed out
+    if current_time - batch_info['last_activity'] > BATCH_TIMEOUT:
+        # Batch has timed out, remove it from active batches
+        del active_batches[batch_id]
+        return False
+        
+    return batch_info['status'] == 'processing'
+
+def update_batch_status(batch_id, status, prompt_id=None):
+    """
+    Update the status of a batch.
+    
+    Args:
+        batch_id (str): The batch ID to update
+        status (str): The new status ('processing' or 'completed')
+        prompt_id (str, optional): The prompt ID to add to the batch's prompt_ids list
+    """
+    if not batch_id:
+        return
+        
+    current_time = time.time()
+    
+    if batch_id not in active_batches:
+        active_batches[batch_id] = {
+            'status': status,
+            'last_activity': current_time,
+            'prompt_ids': []
+        }
+    else:
+        active_batches[batch_id]['status'] = status
+        active_batches[batch_id]['last_activity'] = current_time
+        
+    if prompt_id and batch_id in active_batches:
+        if 'prompt_ids' not in active_batches[batch_id]:
+            active_batches[batch_id]['prompt_ids'] = []
+        active_batches[batch_id]['prompt_ids'].append(prompt_id)
+
+def clean_inactive_batches():
+    """
+    Clean up inactive batches that have timed out.
+    """
+    current_time = time.time()
+    batch_ids_to_remove = []
+    
+    for batch_id, batch_info in active_batches.items():
+        if current_time - batch_info['last_activity'] > BATCH_TIMEOUT:
+            batch_ids_to_remove.append(batch_id)
+            
+    for batch_id in batch_ids_to_remove:
+        del active_batches[batch_id]
 
 session = requests.Session()
 retries = Retry(total=10, backoff_factor=0.1, status_forcelist=[502, 503, 504])
@@ -156,7 +230,7 @@ def check_server(url, retries=500, delay=50):
     )
     return False
 
-def get_workflow_payload(workflow_name, payload, image_names=None):
+def get_workflow_payload(workflow_name, payload, image_names=None, job_id):
     # Try multiple possible locations for the workflow file
     possible_paths = [        
         f'/workflows/{workflow_name}.json', 
@@ -182,11 +256,11 @@ def get_workflow_payload(workflow_name, payload, image_names=None):
         raise FileNotFoundError(f"Could not find workflow file for: {workflow_name}. Tried paths: {possible_paths}")
 
     if workflow_name == 'img2imgPersona':
-        workflow = get_img2imgPersona_payload(workflow, payload, image_names)
+        workflow = get_img2imgPersona_payload(workflow, payload, image_names, job_id)
 
     return workflow
 
-def get_img2imgPersona_payload(workflow, payload, image_names):
+def get_img2imgPersona_payload(workflow, payload, image_names, prefix):
     workflow["10"]["inputs"]["seed"] = payload["seed"]
     workflow["10"]["inputs"]["steps"] = payload["steps"]
     workflow["10"]["inputs"]["cfg"] = payload["cfg_scale"]
@@ -211,6 +285,7 @@ def get_img2imgPersona_payload(workflow, payload, image_names):
     workflow["190"]["inputs"]["image"] = image_names[0]
     workflow["174"]["inputs"]["text"] = payload["prompt"]
     workflow["176"]["inputs"]["text"] = payload["negative_prompt"]
+    workflow["193"]["inputs"]["prefix"] = prefix
     return workflow
 
 
@@ -571,6 +646,15 @@ def handler(event):
         # Check if batchId is provided in the input
         batch_id = validated_data.get('batchId')
         
+        # Clean up any inactive batches
+        clean_inactive_batches()
+        
+        # If a batchId is provided, check if it's already being processed
+        if batch_id and is_batch_active(batch_id):
+            rp_logger.info(f"Batch {batch_id} is already being processed, using ComfyUI queue system", job_id)
+            # Mark this batch as still active
+            update_batch_status(batch_id, 'processing')
+        
         # Upload images if they exist and track the updated filenames
         # If batchId is provided, it will be used to reuse previously uploaded images
         upload_result = upload_images(images, batch_id)
@@ -595,11 +679,15 @@ def handler(event):
         # Now get the workflow payload with the updated image names
         if workflow == 'img2imgPersona':
             try:
-                payload = get_workflow_payload(workflow, payload, updated_image_names)
+                payload = get_workflow_payload(workflow, payload, updated_image_names, job_id)
             except Exception as e:
                 rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
                 raise
 
+        # If a batchId is provided, mark it as processing
+        if batch_id:
+            update_batch_status(batch_id, 'processing')
+            
         queue_response = send_post_request(
             'prompt',
             {
@@ -657,6 +745,10 @@ def handler(event):
                         # rp_logger.info(f'Deleting output file: {image_path}', job_id)
                         # os.remove(image_path)
 
+                    # If a batchId was provided, mark it as completed
+                    if batch_id:
+                        update_batch_status(batch_id, 'completed', prompt_id)
+                        
                     return {
                         'images': images
                     }
@@ -695,6 +787,11 @@ def handler(event):
     
     except Exception as e:
         rp_logger.error(f'An exception was raised: {e}', job_id)
+        
+        # If a batchId was provided, mark it as completed with error
+        if 'batch_id' in locals() and batch_id:
+            update_batch_status(batch_id, 'completed')
+            rp_logger.info(f"Marked batch {batch_id} as completed due to error", job_id)
 
         return {
             'error': traceback.format_exc(),
