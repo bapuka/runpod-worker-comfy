@@ -257,6 +257,7 @@ def get_workflow_payload(workflow_name, payload, image_names=None, job_id=None):
 
     if workflow_name == 'img2imgPersona':
         workflow = get_img2imgPersona_payload(workflow, payload, image_names, job_id)
+        rp_logger.info(f'Workflow payload for {workflow_name} generated successfully', job_id)
 
     return workflow
 
@@ -699,7 +700,7 @@ def handler(event):
         if queue_response.status_code == 200:
             resp_json = queue_response.json()
             prompt_id = resp_json['prompt_id']
-            rp_logger.info(f'Prompt queued successfully: {prompt_id}', job_id)
+            rp_logger.info(f'runpod-worker-comfy - Prompt queued successfully: {prompt_id}', job_id)
             retries = 0
             
             while True:
