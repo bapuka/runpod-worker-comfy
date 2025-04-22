@@ -18,5 +18,10 @@ INPUT_SCHEMA = {
         'type': list,
         'required': False,
         'default': []
+    },
+    "batchId": {
+        'type': str,
+        'required': False,
+        'description': 'Unique identifier for batch processing. When provided, images will be uploaded only once per batch.'
     }
 }

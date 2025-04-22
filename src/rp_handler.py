@@ -17,6 +17,7 @@ import base64
 from io import BytesIO
 from PIL import Image
 import re
+from collections import defaultdict
 
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
@@ -31,6 +32,10 @@ COMFY_HOST = "127.0.0.1:3001"
 # Enforce a clean state after each job is done
 # see https://docs.runpod.io/docs/handler-additional-controls#refresh-worker
 REFRESH_WORKER = os.environ.get("REFRESH_WORKER", "false").lower() == "true"
+
+# Dictionary to store uploaded images by batchId
+# Structure: {batchId: {"original_name": "updated_name"}}
+batch_uploaded_images = defaultdict(dict)
 
 BASE_URI = f'http://{COMFY_HOST}'
 VOLUME_MOUNT_PATH = '/runpod-volume'
@@ -303,18 +308,23 @@ def is_valid_image(image_data):
     except Exception:
         return False
 
-def upload_images(images):
+def upload_images(images, batch_id=None):
     """
     Upload a list of base64 encoded images to the ComfyUI server using the /upload/image endpoint.
     Automatically converts all images to PNG format to ensure compatibility with ComfyUI.
+    
+    If batch_id is provided, it will check if images have already been uploaded for this batch
+    and reuse them instead of uploading again.
 
     Args:
         images (list): A list of dictionaries, each containing the 'name' of the image and the 'image' as a base64 encoded string.
-        server_address (str): The address of the ComfyUI server.
+        batch_id (str, optional): A unique identifier for batch processing. If provided, images will only be uploaded once per batch.
 
     Returns:
-        list: A list of responses from the server for each image upload.
+        dict: A dictionary containing upload status, messages, and updated filenames.
     """
+    global batch_uploaded_images
+    
     if not images:
         return {"status": "success", "message": "No images to upload", "details": []}
 
@@ -322,8 +332,42 @@ def upload_images(images):
     upload_errors = []
     # Track the updated filenames during the upload process
     updated_filenames = []
-
-    print(f"runpod-worker-comfy - image(s) upload")
+    
+    # Check if we have a batch_id and if we've already uploaded some images for this batch
+    if batch_id and batch_id in batch_uploaded_images:
+        rp_logger.info(f"Using previously uploaded images for batch: {batch_id}")
+        
+        # Create a mapping of original names to already uploaded names
+        uploaded_map = batch_uploaded_images[batch_id]
+        
+        # Filter out images that have already been uploaded
+        images_to_upload = []
+        for image in images:
+            original_name = image["name"]
+            if original_name in uploaded_map:
+                # Image already uploaded, use the updated name
+                updated_name = uploaded_map[original_name]
+                rp_logger.info(f"Reusing previously uploaded image: {original_name} -> {updated_name}")
+                updated_filenames.append(updated_name)
+                responses.append(f"Reusing previously uploaded {updated_name}")
+            else:
+                # Image not uploaded yet, add to the list to upload
+                images_to_upload.append(image)
+        
+        # If all images were already uploaded, return success
+        if not images_to_upload:
+            return {
+                "status": "success",
+                "message": "All images were previously uploaded",
+                "details": responses,
+                "updated_filenames": updated_filenames
+            }
+        
+        # Otherwise, continue with uploading the remaining images
+        images = images_to_upload
+        print(f"runpod-worker-comfy - uploading {len(images)} new images for batch {batch_id}")
+    else:
+        print(f"runpod-worker-comfy - image(s) upload" + (f" for batch {batch_id}" if batch_id else ""))
 
     for image in images:
         original_name = image["name"]
@@ -400,6 +444,10 @@ def upload_images(images):
             responses.append(f"Successfully uploaded {name}")
             # Add the updated name to the list
             updated_filenames.append(name)
+            
+            # If we have a batch_id, store the mapping of original name to updated name
+            if batch_id:
+                batch_uploaded_images[batch_id][original_name] = name
     
     # Log the updated filenames for debugging
     rp_logger.info(f"Original filenames: {[img['name'] for img in images]}")
@@ -520,8 +568,12 @@ def handler(event):
             COMFY_API_AVAILABLE_INTERVAL_MS,
         )
 
+        # Check if batchId is provided in the input
+        batch_id = validated_data.get('batchId')
+        
         # Upload images if they exist and track the updated filenames
-        upload_result = upload_images(images)
+        # If batchId is provided, it will be used to reuse previously uploaded images
+        upload_result = upload_images(images, batch_id)
         if upload_result["status"] == "error":
             return upload_result
         
