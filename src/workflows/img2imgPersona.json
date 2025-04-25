@@ -21,7 +21,7 @@
     },
     "10": {
       "inputs": {
-        "seed": 1075302631949735,
+        "seed": 0,
         "steps": 30,
         "cfg": 5,
         "sampler_name": "dpm_2",
