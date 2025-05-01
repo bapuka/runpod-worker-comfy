@@ -6,7 +6,8 @@ INPUT_SCHEMA = {
         'constraints': lambda workflow: workflow in [
             'default',
             'txt2img',
-            'img2imgPersona',
+            "txt2imgSceneSDXL",
+            'img2imgPersona',            
             'custom'
         ]
     },

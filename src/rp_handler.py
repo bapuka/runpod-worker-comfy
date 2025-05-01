@@ -258,6 +258,10 @@ def get_workflow_payload(workflow_name, payload, image_names=None, job_id=None):
     if workflow_name == 'img2imgPersona':
         workflow = get_img2imgPersona_payload(workflow, payload, image_names, job_id)
         rp_logger.info(f'Workflow payload for {workflow_name} generated successfully', job_id)
+        
+    if workflow_name == 'txt2imgSceneSDXL':
+        workflow = get_txt2imgSceneSDXL_payload(workflow, payload, job_id)
+        rp_logger.info(f'Workflow payload for {workflow_name} generated successfully', job_id)
 
     return workflow
 
@@ -281,14 +285,36 @@ def get_img2imgPersona_payload(workflow, payload, image_names, prefix):
     workflow["176"]["inputs"]["target_width"] = payload["width"]
     workflow["176"]["inputs"]["target_height"] = payload["height"]
     workflow["184"]["inputs"]["image"] = image_names[0]
-    workflow["186"]["inputs"]["image"] = image_names[0]
-    workflow["188"]["inputs"]["image"] = image_names[0]
-    workflow["190"]["inputs"]["image"] = image_names[0]
+    workflow["186"]["inputs"]["image"] = image_names[1] if image_names[1] else image_names[0]
+    workflow["188"]["inputs"]["image"] = image_names[2] if image_names[2] else image_names[0]
+    workflow["190"]["inputs"]["image"] = image_names[3] if image_names[3] else image_names[0]
     workflow["174"]["inputs"]["text"] = payload["prompt"]
     workflow["176"]["inputs"]["text"] = payload["negative_prompt"]
     workflow["193"]["inputs"]["filename_prefix"] = prefix
     return workflow
 
+def get_txt2imgSceneSDXL_payload(workflow, payload, prefix):
+    workflow["10"]["inputs"]["seed"] = payload["seed"]
+    workflow["10"]["inputs"]["steps"] = payload["steps"]
+    workflow["10"]["inputs"]["cfg"] = payload["cfg_scale"]
+    workflow["10"]["inputs"]["sampler_name"] = payload["sampler_name"]
+    workflow["10"]["inputs"]["scheduler"] = payload["scheduler"]
+    workflow["7"]["inputs"]["ckpt_name"] = payload["ckpt_name"]
+    workflow["8"]["inputs"]["width"] = payload["width"]
+    workflow["8"]["inputs"]["height"] = payload["height"]
+    workflow["8"]["inputs"]["batch_size"] = payload["batch_size"]
+    workflow["174"]["inputs"]["width"] = payload["width"]
+    workflow["174"]["inputs"]["height"] = payload["height"]
+    workflow["174"]["inputs"]["target_width"] = payload["width"]
+    workflow["174"]["inputs"]["target_height"] = payload["height"]
+    workflow["176"]["inputs"]["width"] = payload["width"]
+    workflow["176"]["inputs"]["height"] = payload["height"]
+    workflow["176"]["inputs"]["target_width"] = payload["width"]
+    workflow["176"]["inputs"]["target_height"] = payload["height"]
+    workflow["174"]["inputs"]["text"] = payload["prompt"]
+    workflow["176"]["inputs"]["text"] = payload["negative_prompt"]
+    workflow["193"]["inputs"]["filename_prefix"] = prefix
+    return workflow
 
 def is_webp_base64(base64_string):
     """
@@ -681,6 +707,13 @@ def handler(event):
         if workflow == 'img2imgPersona':
             try:
                 payload = get_workflow_payload(workflow, payload, updated_image_names, job_id)
+            except Exception as e:
+                rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
+                raise
+            
+        if workflow == 'txt2imgSceneSDXL':
+            try:
+                payload = get_workflow_payload(workflow, payload, None, job_id)
             except Exception as e:
                 rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
                 raise
