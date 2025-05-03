@@ -249,7 +249,7 @@
         "text": "score_9, score_8_up, score_7_up, (a 5 year old little Asian girl:1.5) black hair with pigtails, chubby, wearing cozy winter pajamas, (detailed facial features:1.3), sparkly eager eyes, in (cozy bedroom:1.5), magical computer mouse (gleaming with ethereal blue aura:1.3), floating slightly above table, (soft glowing red button:1.2), (magical sparkles in blue and silver:1.3), minecraft blocks floating around as particles, warm home interior background, mystical atmosphere, mood is cozy,\ndetailed artwork, Ghibli style, childrens book illustration, inkscape, whimsical, perfect details, 8k, with incredible vibrant colors, ray tracing, dynamic epic composition, blur background,",
         "parser": "A1111",
         "mean_normalization": true,
-        "multi_conditioning": false,
+        "multi_conditioning": true,
         "use_old_emphasis_implementation": false,
         "with_SDXL": false,
         "ascore": 6,
@@ -276,11 +276,11 @@
     "176": {
       "inputs": {
         "text": "score_6, score_5, score_4, worst quality:1.4, low quality:1.4, easynegative, negative_hand-neg, animal ear, chinese, kanji, breast, cropped, watermark, (low quality, worst quality:1.4), (bad anatomy), monochrome,(long body), bad anatomy , liquid body, malformed, mutated, anatomical nonsense ,bad proportions, uncoordinated body, unnatural body, ugly, gross proportions, disfigured, deformed,  mutation, poorly drawn , bad hand, mutated hand, bad fingers, mutated finger, freckles, mole, nude, nsfw",
-        "parser": "A1111",
+        "parser": "comfy++",
         "mean_normalization": true,
         "multi_conditioning": false,
         "use_old_emphasis_implementation": false,
-        "with_SDXL": false,
+        "with_SDXL": true,
         "ascore": 6,
         "width": 1024,
         "height": 1024,
