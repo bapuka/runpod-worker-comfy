@@ -467,7 +467,7 @@
   "182": {
     "inputs": {
       "lora_name": {
-        "content": "sdxl/aidmaMidjourneyV6.1-v0.1.safetensors",
+        "content": "aidmaMidjourneyV6.1-v0.1.safetensors",
         "image": null
       },
       "strength_model": 0.65,
