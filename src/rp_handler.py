@@ -642,7 +642,7 @@ def handler(event):
     Returns:
         dict: A dictionary containing either an error message or a success status with generated images.
     """
-    rp_logger.info('Starting RunPod Serverless handler', event)
+    rp_logger.info('Starting RunPod Serverless handler', event["id"])
     job_id = event["id"]
 
     try:
