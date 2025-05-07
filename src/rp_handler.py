@@ -60,7 +60,8 @@ def is_batch_active(batch_id):
     Returns:
         bool: True if the batch is active, False otherwise
     """
-    if not batch_id or batch_id not in active_batches:
+    # Handle case where batch_id is "undefined" or None or empty
+    if not batch_id or batch_id == "undefined" or batch_id not in active_batches:
         return False
         
     batch_info = active_batches[batch_id]
@@ -83,7 +84,8 @@ def update_batch_status(batch_id, status, prompt_id=None):
         status (str): The new status ('processing' or 'completed')
         prompt_id (str, optional): The prompt ID to add to the batch's prompt_ids list
     """
-    if not batch_id:
+    # Handle case where batch_id is "undefined" or None or empty
+    if not batch_id or batch_id == "undefined":
         return
         
     current_time = time.time()
@@ -673,6 +675,11 @@ def handler(event):
         # Check if batchId is provided in the input
         batch_id = validated_data.get('batchId')
         
+        # Handle case where batch_id is "undefined"
+        if batch_id == "undefined":
+            rp_logger.info("Client sent batchId: undefined, treating as no batch ID", job_id)
+            batch_id = None
+        
         # Clean up any inactive batches
         clean_inactive_batches()
         
@@ -823,7 +830,7 @@ def handler(event):
         rp_logger.error(f'An exception was raised: {e}', job_id)
         
         # If a batchId was provided, mark it as completed with error
-        if 'batch_id' in locals() and batch_id:
+        if 'batch_id' in locals() and batch_id and batch_id != "undefined":
             update_batch_status(batch_id, 'completed')
             rp_logger.info(f"Marked batch {batch_id} as completed due to error", job_id)
 
