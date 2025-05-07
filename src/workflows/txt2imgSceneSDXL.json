@@ -1,7 +1,7 @@
 {
   "7": {
     "inputs": {
-      "ckpt_name": "CHEYENNE_v20.safetensors"
+      "ckpt_name": "sdxl/CHEYENNE_v18.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
@@ -128,52 +128,6 @@
       "title": "CLIP Set Last Layer"
     }
   },
-  "168": {
-    "inputs": {
-      "lora_name": {
-        "content": "Translucent-Subsurface_scattering_test.safetensors",
-        "image": null
-      },
-      "strength_model": 0.33,
-      "strength_clip": 1,
-      "example": "[none]",
-      "model": [
-        "182",
-        0
-      ],
-      "clip": [
-        "182",
-        1
-      ]
-    },
-    "class_type": "LoraLoader|pysssss",
-    "_meta": {
-      "title": "Lora Loader 🐍"
-    }
-  },
-  "170": {
-    "inputs": {
-      "lora_name": {
-        "content": "add-detail-xl.safetensors",
-        "image": null
-      },
-      "strength_model": 1.3,
-      "strength_clip": 1,
-      "example": "[none]",
-      "model": [
-        "7",
-        0
-      ],
-      "clip": [
-        "159",
-        0
-      ]
-    },
-    "class_type": "LoraLoader|pysssss",
-    "_meta": {
-      "title": "Lora Loader 🐍"
-    }
-  },
   "174": {
     "inputs": {
       "text": "score_9, score_8_up, score_7_up, (a 2 year old little Asian boy:1.5) sitting on Red amphibious vehicle floating on river with several passengers , Vehicle delivering children to kindergarten, colorful school building background, happy kids waving, mood is cheerful,\ndetailed artwork, Ghibli style, childrens book illustration, inkscape, whimsical, perfect details, 8k, with incredible vibrant colors, ray tracing, dynamic epic composition, blur background,",
@@ -281,7 +235,7 @@
       "info_debug": "",
       "debug": false,
       "*": [
-        "168",
+        "196",
         0
       ]
     },
@@ -339,7 +293,7 @@
       "info_debug": "",
       "debug": false,
       "*": [
-        "168",
+        "196",
         1
       ]
     },
@@ -464,29 +418,6 @@
       "title": "Settings (smZ)"
     }
   },
-  "182": {
-    "inputs": {
-      "lora_name": {
-        "content": "aidmaMidjourneyV6.1-v0.1.safetensors",
-        "image": null
-      },
-      "strength_model": 0.65,
-      "strength_clip": 1,
-      "example": "[none]",
-      "model": [
-        "170",
-        0
-      ],
-      "clip": [
-        "170",
-        1
-      ]
-    },
-    "class_type": "LoraLoader|pysssss",
-    "_meta": {
-      "title": "Lora Loader 🐍"
-    }
-  },
   "193": {
     "inputs": {
       "filename_prefix": "img_",
@@ -498,6 +429,63 @@
     "class_type": "SaveImage",
     "_meta": {
       "title": "Save Image"
+    }
+  },
+  "194": {
+    "inputs": {
+      "lora_name": "add-detail-xl.safetensors",
+      "strength_model": 1.3,
+      "strength_clip": 1,
+      "model": [
+        "7",
+        0
+      ],
+      "clip": [
+        "159",
+        0
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA"
+    }
+  },
+  "195": {
+    "inputs": {
+      "lora_name": "sdxl/aidmaMidjourneyV6.1-v0.1.safetensors",
+      "strength_model": 0.65,
+      "strength_clip": 1,
+      "model": [
+        "194",
+        0
+      ],
+      "clip": [
+        "194",
+        1
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA"
+    }
+  },
+  "196": {
+    "inputs": {
+      "lora_name": "Translucent-Subsurface_scattering_test.safetensors",
+      "strength_model": 0.33,
+      "strength_clip": 1,
+      "model": [
+        "195",
+        0
+      ],
+      "clip": [
+        "195",
+        1
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA"
     }
   }
 }
