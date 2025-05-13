@@ -155,7 +155,7 @@ def main():
             )
 
             ultimatesdupscale_2 = ultimatesdupscale.upscale(
-                upscale_by=2.0000000000000004,
+                upscale_by=2,
                 seed=random.randint(1, 2**64),
                 steps=20,
                 cfg=8,
