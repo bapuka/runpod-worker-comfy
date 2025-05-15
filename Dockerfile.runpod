@@ -54,7 +54,7 @@ WORKDIR /
 # Copy runpod scripts
 COPY src/schemas ./schemas
 COPY src/workflows ./workflows
-ADD src/start.sh src/rp_handler.py ./
+ADD src/start.sh src/rp_handler.py upscaler.py ./
 RUN chmod +x /start.sh
 
 # Start the container

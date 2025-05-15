@@ -1,20 +1,21 @@
+runpod
 Pillow
 PyYAML
-addict
-future
-insightface>=0.7.3
-lmdb
-lpips
-numpy
-onnx>=1.17.0
-onnxruntime
-opencv-python
-protobuf
-scikit-image
-scipy
-torch
-torchvision
-tqdm
-yapf
-python-dotenv
-runpod==1.7.7
+# addict
+# future
+# insightface>=0.7.3
+# lmdb
+# lpips
+# numpy
+# onnx>=1.17.0
+# onnxruntime
+# opencv-python
+# protobuf
+# scikit-image
+# scipy
+# torch
+# torchvision
+# tqdm
+# yapf
+# python-dotenv
+# runpod==1.7.7

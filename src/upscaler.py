@@ -115,7 +115,7 @@ def import_custom_nodes() -> None:
 from nodes import NODE_CLASS_MAPPINGS
 
 
-def main():
+def queue(image="", scale=2):
     import_custom_nodes()
     with torch.inference_mode():
         upscalemodelloader = NODE_CLASS_MAPPINGS["UpscaleModelLoader"]()
@@ -140,11 +140,11 @@ def main():
         )
 
         loadimage = NODE_CLASS_MAPPINGS["LoadImage"]()
-        loadimage_10 = loadimage.load_image(image="scene-01_003.png")
+        loadimage_10 = loadimage.load_image(image=image)
 
         automatic_cfg = NODE_CLASS_MAPPINGS["Automatic CFG"]()
         ultimatesdupscale = NODE_CLASS_MAPPINGS["UltimateSDUpscale"]()
-        image_comparer_rgthree = NODE_CLASS_MAPPINGS["Image Comparer (rgthree)"]()
+        # image_comparer_rgthree = NODE_CLASS_MAPPINGS["Image Comparer (rgthree)"]()
         saveimage = NODE_CLASS_MAPPINGS["SaveImage"]()
 
         for q in range(1):
@@ -155,7 +155,7 @@ def main():
             )
 
             ultimatesdupscale_2 = ultimatesdupscale.upscale(
-                upscale_by=2,
+                upscale_by=scale,
                 seed=random.randint(1, 2**64),
                 steps=20,
                 cfg=8,
@@ -182,16 +182,18 @@ def main():
                 upscale_model=get_value_at_index(upscalemodelloader_3, 0),
             )
 
-            image_comparer_rgthree_11 = image_comparer_rgthree.compare_images(
-                image_a=get_value_at_index(loadimage_10, 0),
-                image_b=get_value_at_index(ultimatesdupscale_2, 0),
-            )
+            # image_comparer_rgthree_11 = image_comparer_rgthree.compare_images(
+            #     image_a=get_value_at_index(loadimage_10, 0),
+            #     image_b=get_value_at_index(ultimatesdupscale_2, 0),
+            # )
 
             saveimage_13 = saveimage.save_images(
                 filename_prefix="ComfyUI",
                 images=get_value_at_index(ultimatesdupscale_2, 0),
             )
+            
+            return get_value_at_index(ultimatesdupscale_2, 0)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

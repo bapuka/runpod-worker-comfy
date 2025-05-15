@@ -629,6 +629,47 @@ def get_filenames(output):
         if 'images' in value and isinstance(value['images'], list):
             return value['images']
 
+def handle_python_upscaler(image_names, job_id):
+    """
+    Handle the Python server upscaler functionality.
+    
+    Args:
+        image_names (list): List of image names to upscale
+        job_id (str): The job ID for logging
+        
+    Returns:
+        dict: A dictionary containing the upscaled images
+    """
+    try:
+        # Use absolute import instead of relative import
+        import sys
+        import os
+        # Add the current directory to sys.path if not already there
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        if current_dir not in sys.path:
+            sys.path.append(current_dir)
+        
+        # Import the queue function from upscaler module
+        from upscaler import queue
+        
+        # Log the upscaling process
+        rp_logger.info(f'Starting upscaling process with image: {image_names[0]}', job_id)
+        
+        # Call the queue function with the first image name and scale factor 4
+        response = queue(image_names[0], 4)
+        
+        rp_logger.info(f'Upscaling completed successfully', job_id)
+        
+        return {
+            'images': response
+        }
+    except ImportError as e:
+        rp_logger.error(f'Failed to import upscaler module: {e}', job_id)
+        raise RuntimeError(f'Failed to import upscaler module: {e}')
+    except Exception as e:
+        rp_logger.error(f'Error in Python server: {e}', job_id)
+        raise RuntimeError(f'Error in Python server: {e}')
+
 def handler(event):
     """
     The main function that handles a job of generating an image.
@@ -656,7 +697,8 @@ def handler(event):
             rp_logger.info('Input validated successfully', job_id)
 
         # Extract validated data
-        validated_data = validated_input["validated_input"]        
+        validated_data = validated_input["validated_input"]     
+        server_type = validated_data["server"]   
         workflow = validated_data["workflow"]
         payload = validated_data['payload']
         images = validated_data['images'] if 'images' in validated_data else []
@@ -665,13 +707,15 @@ def handler(event):
             workflow = 'txt2img'
         
         rp_logger.info(f'Workflow: {workflow}', job_id)
+        
+        if server_type == 'comfyui':
 
-        # Make sure that the ComfyUI API is available
-        check_server(
-            f"http://{COMFY_HOST}",
-            COMFY_API_AVAILABLE_MAX_RETRIES,
-            COMFY_API_AVAILABLE_INTERVAL_MS,
-        )
+            # Make sure that the ComfyUI API is available
+            check_server(
+                f"http://{COMFY_HOST}",
+                COMFY_API_AVAILABLE_MAX_RETRIES,
+                COMFY_API_AVAILABLE_INTERVAL_MS,
+            )
 
         # Check if batchId is provided in the input
         batch_id = validated_data.get('batchId')
@@ -729,103 +773,106 @@ def handler(event):
         # If a batchId is provided, mark it as processing
         if batch_id:
             update_batch_status(batch_id, 'processing')
-            
-        queue_response = send_post_request(
-            'prompt',
-            {
-                'prompt': payload
-            }
-        )
-        rp_logger.info(f'Prompt: {payload}', job_id)
         
-        if queue_response.status_code == 200:
-            resp_json = queue_response.json()
-            prompt_id = resp_json['prompt_id']
-            rp_logger.info(f'runpod-worker-comfy - Prompt queued successfully: {prompt_id}', job_id)
-            retries = 0
+        if server_type == 'python':    
+            return handle_python_upscaler(updated_image_names, job_id)
+        elif server_type == 'comfyui':
+            queue_response = send_post_request(
+                'prompt',
+                {
+                    'prompt': payload
+                }
+            )
+            rp_logger.info(f'Prompt: {payload}', job_id)
             
-            while True:
-                # Only log every 15 retries so the logs don't get spammed
-                if retries == 0 or retries % 15 == 0:
-                    rp_logger.info(f'Getting status of prompt: {prompt_id}', job_id)
+            if queue_response.status_code == 200:
+                resp_json = queue_response.json()
+                prompt_id = resp_json['prompt_id']
+                rp_logger.info(f'runpod-worker-comfy - Prompt queued successfully: {prompt_id}', job_id)
+                retries = 0
                 
-                r = send_get_request(f'history/{prompt_id}')
-                resp_json = r.json()
+                while True:
+                    # Only log every 15 retries so the logs don't get spammed
+                    if retries == 0 or retries % 15 == 0:
+                        rp_logger.info(f'Getting status of prompt: {prompt_id}', job_id)
+                    
+                    r = send_get_request(f'history/{prompt_id}')
+                    resp_json = r.json()
 
-                if r.status_code == 200 and len(resp_json):
-                    break
+                    if r.status_code == 200 and len(resp_json):
+                        break
 
-                time.sleep(0.2)
-                retries += 1
-                
-            status = resp_json[prompt_id]['status']
-            if status['status_str'] == 'success' and status['completed']:
-                # Job was processed successfully
-                outputs = resp_json[prompt_id]['outputs']
+                    time.sleep(0.2)
+                    retries += 1
+                    
+                status = resp_json[prompt_id]['status']
+                if status['status_str'] == 'success' and status['completed']:
+                    # Job was processed successfully
+                    outputs = resp_json[prompt_id]['outputs']
 
-                if len(outputs):
-                    rp_logger.info(f'Images generated successfully for prompt: {prompt_id}', job_id)
-                    image_filenames = get_filenames(outputs)
-                    images = []
+                    if len(outputs):
+                        rp_logger.info(f'Images generated successfully for prompt: {prompt_id}', job_id)
+                        image_filenames = get_filenames(outputs)
+                        images = []
 
-                    for image_filename in image_filenames:
-                        filename = image_filename['filename']
-                        image_path = f'/ComfyUI/output/{filename}'
-                        rp_logger.info(f'Image path: {image_path}', job_id)
-                                                
-                        with Image.open(image_path) as img:
-                            # width, height = img.size
-                            # rp_logger.info(f"The image size is: {img.size}")
-                            # rp_logger.info(f"The image resolution is: {width}x{height}")
-                            output = BytesIO()
-                            img.save(output, format='PNG')
-                            images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
-                            # output.close()
-                        # with open(image_path, 'rb') as image_file:                            
-                        #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
+                        for image_filename in image_filenames:
+                            filename = image_filename['filename']
+                            image_path = f'/ComfyUI/output/{filename}'
+                            rp_logger.info(f'Image path: {image_path}', job_id)
+                                                    
+                            with Image.open(image_path) as img:
+                                # width, height = img.size
+                                # rp_logger.info(f"The image size is: {img.size}")
+                                # rp_logger.info(f"The image resolution is: {width}x{height}")
+                                output = BytesIO()
+                                img.save(output, format='PNG')
+                                images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
+                                # output.close()
+                            # with open(image_path, 'rb') as image_file:                            
+                            #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
 
-                        # rp_logger.info(f'Deleting output file: {image_path}', job_id)
-                        # os.remove(image_path)
+                            # rp_logger.info(f'Deleting output file: {image_path}', job_id)
+                            # os.remove(image_path)
 
-                    # If a batchId was provided, mark it as completed
-                    if batch_id:
-                        update_batch_status(batch_id, 'completed', prompt_id)
-                        
-                    return {
-                        'images': images
-                    }
+                        # If a batchId was provided, mark it as completed
+                        if batch_id:
+                            update_batch_status(batch_id, 'completed', prompt_id)
+                            
+                        return {
+                            'images': images
+                        }
+                    else:
+                        raise RuntimeError(f'No output found for prompt id: {prompt_id}')
                 else:
-                    raise RuntimeError(f'No output found for prompt id: {prompt_id}')
+                    # Job did not process successfully
+                    for message in status['messages']:
+                        key, value = message
+
+                        if key == 'execution_error':
+                            if 'node_type' in value and 'exception_message' in value:
+                                node_type = value['node_type']
+                                exception_message = value['exception_message']
+                                raise RuntimeError(f'{node_type}: {exception_message}')
+                            else:
+                                # Log to file instead of RunPod because the output tends to be too verbose
+                                # and gets dropped by RunPod logging
+                                error_msg = f'Job did not process successfully for prompt_id: {prompt_id}'
+                                logging.error(error_msg)
+                                logging.info(f'{job_id}: Response JSON: {resp_json}')
+                                raise RuntimeError(error_msg)
             else:
-                # Job did not process successfully
-                for message in status['messages']:
-                    key, value = message
+                try:
+                    queue_response_content = queue_response.json()
+                except Exception as e:
+                    queue_response_content = str(queue_response.content)
 
-                    if key == 'execution_error':
-                        if 'node_type' in value and 'exception_message' in value:
-                            node_type = value['node_type']
-                            exception_message = value['exception_message']
-                            raise RuntimeError(f'{node_type}: {exception_message}')
-                        else:
-                            # Log to file instead of RunPod because the output tends to be too verbose
-                            # and gets dropped by RunPod logging
-                            error_msg = f'Job did not process successfully for prompt_id: {prompt_id}'
-                            logging.error(error_msg)
-                            logging.info(f'{job_id}: Response JSON: {resp_json}')
-                            raise RuntimeError(error_msg)
-        else:
-            try:
-                queue_response_content = queue_response.json()
-            except Exception as e:
-                queue_response_content = str(queue_response.content)
+                rp_logger.error(f'HTTP Status code: {queue_response.status_code}', job_id)
+                rp_logger.error(queue_response_content, job_id)
 
-            rp_logger.error(f'HTTP Status code: {queue_response.status_code}', job_id)
-            rp_logger.error(queue_response_content, job_id)
-
-            return {
-                'error': f'HTTP status code: {queue_response.status_code}',
-                'output': queue_response_content
-            }      
+                return {
+                    'error': f'HTTP status code: {queue_response.status_code}',
+                    'output': queue_response_content
+                }      
     
     except Exception as e:
         rp_logger.error(f'An exception was raised: {e}', job_id)
@@ -858,6 +905,7 @@ if __name__ == "__main__":
     rp_logger.info(f'Current working directory: {os.getcwd()}')
     rp_logger.info(f'Workflows directory exists: {os.path.exists("/workflows")}')
     rp_logger.info(f'Src/workflows directory exists: {os.path.exists("/src/workflows")}')
+    rp_logger.info(f'./src/workflows directory exists: {os.path.exists("./src/workflows")}')
     
     # List files in current directory
     rp_logger.info(f'Files in current directory: {os.listdir(".")}')

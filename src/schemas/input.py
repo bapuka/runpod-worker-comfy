@@ -1,4 +1,10 @@
 INPUT_SCHEMA = {
+    'server': {
+        'type': str,
+        'required': True,
+        'default': 'comfyui',
+        'description': 'Server type to use for processing. Options: comfyui, python, custom. Default: comfyui.',
+        },
     'workflow': {
         'type': str,
         'required': False,
@@ -7,7 +13,8 @@ INPUT_SCHEMA = {
             'default',
             'txt2img',
             "txt2imgSceneSDXL",
-            'img2imgPersona',            
+            'img2imgPersona', 
+            'upscale',
             'custom'
         ]
     },
