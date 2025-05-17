@@ -14,7 +14,7 @@ INPUT_SCHEMA = {
             'txt2img',
             "txt2imgSceneSDXL",
             'img2imgPersona', 
-            'upscale',
+            'upscaleSDXL',
             'custom'
         ]
     },
