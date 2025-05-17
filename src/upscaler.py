@@ -116,9 +116,8 @@ from nodes import NODE_CLASS_MAPPINGS
 
 
 def queue(image="", scale=2):
-    import subprocess
-    result = subprocess.run(['source', '/ComfyUI/venv/bin/activate'], shell=True, check=True)
-    print(f"Activated virtual environment: '{result}'")
+    print('Queueing image for upscale...')
+    
     import_custom_nodes()
     with torch.inference_mode():
         upscalemodelloader = NODE_CLASS_MAPPINGS["UpscaleModelLoader"]()

@@ -644,6 +644,9 @@ def handle_python_upscaler(image_names, job_id):
         # Use absolute import instead of relative import
         import sys
         import os
+        import subprocess
+        result = subprocess.run(['source', '/ComfyUI/venv/bin/activate'], shell=True, check=True)
+        print(f"Activated virtual environment: '{result}'")
         # Add the current directory to sys.path if not already there
         current_dir = os.path.dirname(os.path.abspath(__file__))
         if current_dir not in sys.path:
