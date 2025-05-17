@@ -644,9 +644,13 @@ def handle_python_upscaler(image_names, job_id):
         # Use absolute import instead of relative import
         import sys
         import os
-        import subprocess
-        result = subprocess.run(['source', '/ComfyUI/venv/bin/activate'], shell=True, check=True)
-        print(f"Activated virtual environment: '{result}'")
+        
+        # Instead of trying to activate the venv in a subprocess, we'll modify the Python path directly
+        # to include the ComfyUI venv site-packages
+        venv_site_packages = '/ComfyUI/venv/lib/python3.10/site-packages'
+        if os.path.exists(venv_site_packages) and venv_site_packages not in sys.path:
+            sys.path.insert(0, venv_site_packages)
+            print(f"Added ComfyUI venv site-packages to Python path: {venv_site_packages}")
         # Add the current directory to sys.path if not already there
         current_dir = os.path.dirname(os.path.abspath(__file__))
         if current_dir not in sys.path:
