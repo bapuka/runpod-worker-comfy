@@ -644,32 +644,114 @@ def handle_python_upscaler(image_names, job_id):
         # Use absolute import instead of relative import
         import sys
         import os
+        import subprocess
         
-        # Instead of trying to activate the venv in a subprocess, we'll modify the Python path directly
-        # to include the ComfyUI venv site-packages
-        venv_site_packages = '/ComfyUI/venv/lib/python3.10/site-packages'
-        if os.path.exists(venv_site_packages) and venv_site_packages not in sys.path:
-            sys.path.insert(0, venv_site_packages)
-            print(f"Added ComfyUI venv site-packages to Python path: {venv_site_packages}")
-        # Add the current directory to sys.path if not already there
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        if current_dir not in sys.path:
-            sys.path.append(current_dir)
+        # More comprehensive approach to handle the virtual environment
+        # First, try to find the Python version used in the venv
+        venv_path = '/ComfyUI/venv'
         
-        # Import the queue function from upscaler module
-        from upscaler import queue
+        # Check if the venv directory exists
+        if not os.path.exists(venv_path):
+            rp_logger.error(f"ComfyUI venv directory not found: {venv_path}", job_id)
+            raise RuntimeError(f"ComfyUI venv directory not found: {venv_path}")
         
-        # Log the upscaling process
-        rp_logger.info(f'Starting upscaling process with image: {image_names[0]}', job_id)
+        # Try to find the Python executable in the venv
+        venv_python = os.path.join(venv_path, 'bin', 'python')
+        if not os.path.exists(venv_python):
+            rp_logger.error(f"Python executable not found in venv: {venv_python}", job_id)
+            raise RuntimeError(f"Python executable not found in venv: {venv_python}")
         
-        # Call the queue function with the first image name and scale factor 4
-        response = queue(image_names[0], 4)
+        # Get the Python version from the venv
+        try:
+            python_version_cmd = f"{venv_python} --version"
+            python_version_output = subprocess.check_output(python_version_cmd, shell=True, text=True)
+            rp_logger.info(f"Venv Python version: {python_version_output.strip()}", job_id)
+        except subprocess.CalledProcessError as e:
+            rp_logger.error(f"Failed to get Python version from venv: {e}", job_id)
         
-        rp_logger.info(f'Upscaling completed successfully', job_id)
-        
-        return {
-            'images': response
-        }
+        # Try to execute the upscaler using the venv Python directly
+        try:
+            rp_logger.info(f"Executing upscaler using venv Python directly", job_id)
+            
+            # Create a temporary script to import and run the upscaler
+            temp_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp_upscaler.py')
+            with open(temp_script_path, 'w') as f:
+                f.write(f'''
+import sys
+import os
+from upscaler import queue
+
+# Log the Python path for debugging
+print("Python path:", sys.path)
+
+# Run the upscaler
+result = queue("{image_names[0]}", 4)
+print("Upscaler result:", result)
+''')
+            
+            # Execute the script with the venv Python
+            cmd = f"{venv_python} {temp_script_path}"
+            rp_logger.info(f"Executing command: {cmd}", job_id)
+            result = subprocess.check_output(cmd, shell=True, text=True)
+            rp_logger.info(f"Upscaler output: {result}", job_id)
+            
+            # Clean up the temporary script
+            os.remove(temp_script_path)
+            
+            # Parse the result from the output
+            # This is a simple approach - you might need to adjust based on the actual output format
+            import re
+            match = re.search(r"Upscaler result: (.*)", result)
+            if match:
+                response = eval(match.group(1))  # Be careful with eval - only use with trusted input
+                rp_logger.info(f'Upscaling completed successfully', job_id)
+                return {
+                    'images': response
+                }
+            else:
+                raise RuntimeError("Could not parse upscaler result from output")
+        except Exception as e:
+            rp_logger.error(f'Error executing upscaler with venv Python: {e}', job_id)
+            rp_logger.info(f'Falling back to direct import method', job_id)
+            
+            # Add the current directory to sys.path if not already there
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            if current_dir not in sys.path:
+                sys.path.append(current_dir)
+            
+            # Try to find and add the site-packages directory from the venv
+            site_packages_paths = [
+                os.path.join(venv_path, 'lib', 'python3.10', 'site-packages'),
+                os.path.join(venv_path, 'lib', 'python3.9', 'site-packages'),
+                os.path.join(venv_path, 'lib', 'python3.8', 'site-packages'),
+                os.path.join(venv_path, 'lib', 'python3.7', 'site-packages'),
+                os.path.join(venv_path, 'lib', 'python3', 'site-packages'),
+                os.path.join(venv_path, 'lib64', 'python3.10', 'site-packages'),
+                os.path.join(venv_path, 'lib64', 'python3.9', 'site-packages'),
+                os.path.join(venv_path, 'lib64', 'python3.8', 'site-packages'),
+                os.path.join(venv_path, 'lib64', 'python3.7', 'site-packages'),
+                os.path.join(venv_path, 'lib64', 'python3', 'site-packages')
+            ]
+            
+            for path in site_packages_paths:
+                if os.path.exists(path) and path not in sys.path:
+                    sys.path.insert(0, path)
+                    rp_logger.info(f'Added venv site-packages to Python path: {path}', job_id)
+            
+            # Import the queue function from upscaler module
+            from upscaler import queue
+            
+            # Log the upscaling process
+            rp_logger.info(f'Starting upscaling process with image: {image_names[0]}', job_id)
+            
+            # Call the queue function with the first image name and scale factor 4
+            response = queue(image_names[0], 4)
+            
+            rp_logger.info(f'Upscaling completed successfully', job_id)
+            
+            return {
+                'images': response
+            }
     except ImportError as e:
         rp_logger.error(f'Failed to import upscaler module: {e}', job_id)
         raise RuntimeError(f'Failed to import upscaler module: {e}')

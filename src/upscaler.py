@@ -41,7 +41,7 @@ def find_path(name: str, path: str = None) -> str:
     # Check if the current directory contains the name
     if name in os.listdir(path):
         path_name = os.path.join(path, name)
-        print(f"{name} found: {path_name}")
+        print(f"*{name} found: {path_name}")
         return path_name
 
     # Get the parent directory
