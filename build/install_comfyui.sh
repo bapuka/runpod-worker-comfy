@@ -87,9 +87,23 @@ git clone https://github.com/shiimizu/ComfyUI_smZNodes.git custom_nodes/ComfyUI_
 git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git custom_nodes/ComfyUI-Custom-Scripts
 git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git custom_nodes/ComfyUI_UltimateSDUpscale --recursive
 git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git custom_nodes/ComfyUI-TiledDiffusion
-git clone https://github.com/yolain/ComfyUI-Easy-Use.git custom_nodes/ComfyUI-Easy-Use
-cd custom_nodes/ComfyUI-Easy-Use
-bash ./install.sh
+# Temporarily disable exit on error for this problematic section
+set +e
+echo "Cloning ComfyUI-Easy-Use..."
+if git clone https://github.com/yolain/ComfyUI-Easy-Use.git custom_nodes/ComfyUI-Easy-Use; then
+    cd custom_nodes/ComfyUI-Easy-Use
+    echo "Attempting to install ComfyUI-Easy-Use..."
+    if bash ./install.sh; then
+        echo "ComfyUI-Easy-Use installation completed successfully"
+    else
+        echo "WARNING: ComfyUI-Easy-Use installation script failed with exit code $?, but continuing with the build"
+    fi
+    cd /ComfyUI
+else
+    echo "WARNING: Failed to clone ComfyUI-Easy-Use repository, but continuing with the build"
+fi
+# Re-enable exit on error
+set -e
 
 
 cd /ComfyUI
@@ -97,13 +111,27 @@ git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/
 cd custom_nodes/comfyui_controlnet_aux 
 pip3 install -r requirements.txt
 
+# Temporarily disable exit on error for model downloads
+set +e
+
 echo "Downloading SDXL Refiner"
 cd /ComfyUI/models/checkpoints
-wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors
+if wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors; then
+    echo "SDXL Refiner downloaded successfully"
+else
+    echo "WARNING: Failed to download SDXL Refiner, but continuing with the build"
+fi
 
 echo "Downloading SDXL VAE"
 cd /ComfyUI/models/vae
-wget https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors
+if wget https://huggingface.co/madebyollin/sdxl-vae-fp16-fix/resolve/main/sdxl_vae.safetensors; then
+    echo "SDXL VAE downloaded successfully"
+else
+    echo "WARNING: Failed to download SDXL VAE, but continuing with the build"
+fi
+
+# Re-enable exit on error
+set -e
 
 echo "Creating log directory"
 mkdir -p /logs
