@@ -272,32 +272,32 @@ def get_workflow_payload(workflow_name, payload, image_names=None, job_id=None):
     return workflow
 
 def get_upscaleSDXL_payload(workflow, payload, image_names, prefix):
-    """ UltimateSDUpscale """
+    """ KSampler """
     workflow["2"]["inputs"]["seed"] = payload["seed"]
     workflow["2"]["inputs"]["steps"] = payload["steps"]
     workflow["2"]["inputs"]["cfg"] = payload["cfg_scale"]
     workflow["2"]["inputs"]["sampler_name"] = payload["sampler_name"]
     workflow["2"]["inputs"]["scheduler"] = payload["scheduler"]
     workflow["2"]["inputs"]["denoise"] = payload["denoise"]
-    workflow["2"]["inputs"]["upscale_by"] = payload["upscale_by"]
+    
     """ Checkpoint"""
-    workflow["7"]["inputs"]["ckpt_name"] = payload["ckpt_name"]
+    workflow["1"]["inputs"]["ckpt_name"] = payload["ckpt_name"]
     """ Positive prompt """
-    workflow["8"]["inputs"]["width"] = payload["width"]
-    workflow["8"]["inputs"]["height"] = payload["height"]
-    workflow["8"]["inputs"]["target_width"] = payload["width"]
-    workflow["8"]["inputs"]["target_height"] = payload["height"]
-    workflow["8"]["inputs"]["text"] = payload["prompt"]
+    workflow["4"]["inputs"]["width"] = payload["width"]
+    workflow["4"]["inputs"]["height"] = payload["height"]
+    workflow["4"]["inputs"]["target_width"] = payload["width"]
+    workflow["4"]["inputs"]["target_height"] = payload["height"]
+    workflow["4"]["inputs"]["text"] = payload["prompt"]
     """ Negative prompt """
-    workflow["9"]["inputs"]["width"] = payload["width"]
-    workflow["9"]["inputs"]["height"] = payload["height"]
-    workflow["9"]["inputs"]["target_width"] = payload["width"]
-    workflow["9"]["inputs"]["target_height"] = payload["height"]
-    workflow["9"]["inputs"]["text"] = payload["negative_prompt"]
+    workflow["5"]["inputs"]["width"] = payload["width"]
+    workflow["5"]["inputs"]["height"] = payload["height"]
+    workflow["5"]["inputs"]["target_width"] = payload["width"]
+    workflow["5"]["inputs"]["target_height"] = payload["height"]
+    workflow["5"]["inputs"]["text"] = payload["negative_prompt"]
     """ LoadImage """
-    workflow["10"]["inputs"]["image"] = image_names[0]    
+    workflow["8"]["inputs"]["image"] = image_names[0]    
     """ SaveImage """    
-    workflow["15"]["inputs"]["filename_prefix"] = prefix
+    workflow["25"]["inputs"]["filename_prefix"] = prefix
     return workflow
 
 def get_img2imgPersona_payload(workflow, payload, image_names, prefix):

@@ -1,0 +1,145 @@
+{
+  "1": {
+    "inputs": {
+      "hard_mode": false,
+      "boost": true,
+      "model": [
+        "7",
+        0
+      ]
+    },
+    "class_type": "Automatic CFG",
+    "_meta": {
+      "title": "Automatic CFG"
+    }
+  },
+  "2": {
+    "inputs": {
+      "upscale_by": 1.5000000000000002,
+      "seed": 259917906190691,
+      "steps": 20,
+      "cfg": 8,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "karras",
+      "denoise": 0.09000000000000002,
+      "mode_type": "Linear",
+      "tile_width": 512,
+      "tile_height": 512,
+      "mask_blur": 8,
+      "tile_padding": 32,
+      "seam_fix_mode": "None",
+      "seam_fix_denoise": 1,
+      "seam_fix_width": 64,
+      "seam_fix_mask_blur": 8,
+      "seam_fix_padding": 16,
+      "force_uniform_tiles": true,
+      "tiled_decode": false,
+      "image": [
+        "10",
+        0
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "positive": [
+        "8",
+        0
+      ],
+      "negative": [
+        "9",
+        0
+      ],
+      "vae": [
+        "7",
+        2
+      ],
+      "upscale_model": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "UltimateSDUpscale",
+    "_meta": {
+      "title": "Ultimate SD Upscale"
+    }
+  },
+  "3": {
+    "inputs": {
+      "model_name": "4x-UltraSharp.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Load Upscale Model"
+    }
+  },
+  "7": {
+    "inputs": {
+      "ckpt_name": "sdxl/CHEYENNE_v22VAEBaked.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "8": {
+    "inputs": {
+      "text": "an award-winning, ultra high quality model, masterpiece, sharp focus, 8k, HD, HDR, XDR, focus + sharpen + wide-angle 8K resolution + HDR10 Ken Burns effect + Adobe Lightroom + rule-of-thirds + high-detailed bark. Canon EOS 5D Mark III, 1/160s, f/8, ISO 100. The resulting image is a masterpiece, extremely detailed, UHD , cinematic lighting, volumetric lighting, Film grain, cinematic film still, shallow depth of field, highly detailed,",
+      "speak_and_recognation": {
+        "__value__": [
+          false,
+          true
+        ]
+      },
+      "clip": [
+        "7",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Positive"
+    }
+  },
+  "9": {
+    "inputs": {
+      "text": "blurry, malformed, low quality, worst quality, artifacts, noise, text, watermark, glitch, deformed, ugly, horror, ill",
+      "speak_and_recognation": {
+        "__value__": [
+          false,
+          true
+        ]
+      },
+      "clip": [
+        "7",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative"
+    }
+  },
+  "10": {
+    "inputs": {
+      "image": "Garden_00001_.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "15": {
+    "inputs": {
+      "filename_prefix": "upscaled",
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

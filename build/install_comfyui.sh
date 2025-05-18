@@ -86,6 +86,9 @@ cd /ComfyUI
 git clone https://github.com/shiimizu/ComfyUI_smZNodes.git custom_nodes/ComfyUI_smZNodes
 git clone https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git custom_nodes/ComfyUI-Custom-Scripts
 git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git custom_nodes/ComfyUI_UltimateSDUpscale --recursive
+git clone https://github.com/yolain/ComfyUI-Easy-Use.git custom_nodes/ComfyUI-Easy-Use
+/usr/bin/sh ./custom_nodes/ComfyUI-Easy-Use/install.sh
+git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git custom_nodes/ComfyUI-TiledDiffusion
 
 cd /ComfyUI
 git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git custom_nodes/comfyui_controlnet_aux

@@ -1,90 +1,33 @@
 {
   "1": {
     "inputs": {
-      "hard_mode": false,
-      "boost": true,
-      "model": [
-        "7",
-        0
-      ]
-    },
-    "class_type": "Automatic CFG",
-    "_meta": {
-      "title": "Automatic CFG"
-    }
-  },
-  "2": {
-    "inputs": {
-      "upscale_by": 1.5000000000000002,
-      "seed": 259917906190691,
-      "steps": 20,
-      "cfg": 8,
-      "sampler_name": "dpmpp_2m_sde_gpu",
-      "scheduler": "karras",
-      "denoise": 0.09000000000000002,
-      "mode_type": "Linear",
-      "tile_width": 512,
-      "tile_height": 512,
-      "mask_blur": 8,
-      "tile_padding": 32,
-      "seam_fix_mode": "None",
-      "seam_fix_denoise": 1,
-      "seam_fix_width": 64,
-      "seam_fix_mask_blur": 8,
-      "seam_fix_padding": 16,
-      "force_uniform_tiles": true,
-      "tiled_decode": false,
-      "image": [
-        "10",
-        0
-      ],
-      "model": [
-        "1",
-        0
-      ],
-      "positive": [
-        "8",
-        0
-      ],
-      "negative": [
-        "9",
-        0
-      ],
-      "vae": [
-        "7",
-        2
-      ],
-      "upscale_model": [
-        "3",
-        0
-      ]
-    },
-    "class_type": "UltimateSDUpscale",
-    "_meta": {
-      "title": "Ultimate SD Upscale"
-    }
-  },
-  "3": {
-    "inputs": {
-      "model_name": "4x-UltraSharp.pth"
-    },
-    "class_type": "UpscaleModelLoader",
-    "_meta": {
-      "title": "Load Upscale Model"
-    }
-  },
-  "7": {
-    "inputs": {
-      "ckpt_name": "sdxl/CHEYENNE_v22VAEBaked.safetensors"
+      "ckpt_name": "sdxl/juggernautXL_v9Rundiffusionphoto2.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
       "title": "Load Checkpoint"
     }
   },
-  "8": {
+  "3": {
     "inputs": {
-      "text": "an award-winning, ultra high quality model, masterpiece, sharp focus, 8k, HD, HDR, XDR, focus + sharpen + wide-angle 8K resolution + HDR10 Ken Burns effect + Adobe Lightroom + rule-of-thirds + high-detailed bark. Canon EOS 5D Mark III, 1/160s, f/8, ISO 100. The resulting image is a masterpiece, extremely detailed, UHD , cinematic lighting, volumetric lighting, Film grain, cinematic film still, shallow depth of field, highly detailed,",
+      "method": "Mixture of Diffusers",
+      "tile_width": 768,
+      "tile_height": 768,
+      "tile_overlap": 64,
+      "tile_batch_size": 4,
+      "model": [
+        "1",
+        0
+      ]
+    },
+    "class_type": "TiledDiffusion",
+    "_meta": {
+      "title": "Tiled Diffusion"
+    }
+  },
+  "4": {
+    "inputs": {
+      "text": "an award-winning, ultra high quality model, masterpiece, sharp focus, 8k, HD, HDR, XDR, focus + sharpen + wide-angle 8K resolution + HDR10 Ken Burns effect + Adobe Lightroom + rule-of-thirds + high-detailed bark. Canon EOS 5D Mark III, 1/160s, f/8, ISO 100. The resulting image is a masterpiece, extremely detailed, UHD , cinematic lighting, volumetric lighting, Film grain, cinematic film still, shallow depth of field, highly detailed",
       "speak_and_recognation": {
         "__value__": [
           false,
@@ -92,16 +35,16 @@
         ]
       },
       "clip": [
-        "7",
+        "1",
         1
       ]
     },
     "class_type": "CLIPTextEncode",
     "_meta": {
-      "title": "Positive"
+      "title": "CLIP Text Encode (Prompt)"
     }
   },
-  "9": {
+  "5": {
     "inputs": {
       "text": "blurry, malformed, low quality, worst quality, artifacts, noise, text, watermark, glitch, deformed, ugly, horror, ill",
       "speak_and_recognation": {
@@ -111,29 +54,205 @@
         ]
       },
       "clip": [
-        "7",
+        "1",
         1
       ]
     },
     "class_type": "CLIPTextEncode",
     "_meta": {
-      "title": "Negative"
+      "title": "CLIP Text Encode (Prompt)"
     }
   },
-  "10": {
+  "6": {
     "inputs": {
-      "image": "Garden_00001_.png"
+      "model_name": "4x_NMKD-Siax_200k.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Load Upscale Model"
+    }
+  },
+  "7": {
+    "inputs": {
+      "upscale_model": [
+        "6",
+        0
+      ],
+      "image": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Upscale Image (using Model)"
+    }
+  },
+  "8": {
+    "inputs": {
+      "image": "scene-Forest-05.png"
     },
     "class_type": "LoadImage",
     "_meta": {
       "title": "Load Image"
     }
   },
+  "9": {
+    "inputs": {
+      "size": 1024,
+      "mode": true,
+      "images": [
+        "8",
+        0
+      ]
+    },
+    "class_type": "easy imageScaleDownToSize",
+    "_meta": {
+      "title": "Image Scale Down To Size"
+    }
+  },
+  "10": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "scale_by": 0.5000000000000001,
+      "image": [
+        "7",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "Upscale Image By"
+    }
+  },
+  "12": {
+    "inputs": {
+      "seed": 910686467499901,
+      "steps": 30,
+      "cfg": 5,
+      "sampler_name": "dpmpp_2m_sde_gpu",
+      "scheduler": "karras",
+      "denoise": 0.15000000000000002,
+      "model": [
+        "18",
+        0
+      ],
+      "positive": [
+        "4",
+        0
+      ],
+      "negative": [
+        "5",
+        0
+      ],
+      "latent_image": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
   "15": {
     "inputs": {
-      "filename_prefix": "upscaled",
+      "anything": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "easy cleanGpuUsed",
+    "_meta": {
+      "title": "Clean VRAM Used"
+    }
+  },
+  "16": {
+    "inputs": {
+      "tile_size": 512,
+      "fast": true,
+      "color_fix": true,
+      "pixels": [
+        "10",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEEncodeTiled_TiledDiffusion",
+    "_meta": {
+      "title": "Tiled VAE Encode"
+    }
+  },
+  "17": {
+    "inputs": {
+      "tile_size": 512,
+      "fast": true,
+      "samples": [
+        "12",
+        0
+      ],
+      "vae": [
+        "1",
+        2
+      ]
+    },
+    "class_type": "VAEDecodeTiled_TiledDiffusion",
+    "_meta": {
+      "title": "Tiled VAE Decode"
+    }
+  },
+  "18": {
+    "inputs": {
+      "hard_mode": true,
+      "boost": true,
+      "model": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "Automatic CFG",
+    "_meta": {
+      "title": "Automatic CFG"
+    }
+  },
+  "20": {
+    "inputs": {
+      "upscale_model": [
+        "6",
+        0
+      ],
+      "image": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Upscale Image (using Model)"
+    }
+  },
+  "21": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "scale_by": 0.5000000000000001,
+      "image": [
+        "20",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "Upscale Image By"
+    }
+  },
+  "25": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
       "images": [
-        "2",
+        "21",
         0
       ]
     },
