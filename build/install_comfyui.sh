@@ -89,7 +89,7 @@ git clone https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git custom_nodes/Co
 git clone https://github.com/shiimizu/ComfyUI-TiledDiffusion.git custom_nodes/ComfyUI-TiledDiffusion
 git clone https://github.com/yolain/ComfyUI-Easy-Use.git custom_nodes/ComfyUI-Easy-Use
 cd custom_nodes/ComfyUI-Easy-Use
-/usr/bin/sh install.sh
+bash ./install.sh
 
 
 cd /ComfyUI
