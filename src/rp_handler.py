@@ -273,12 +273,12 @@ def get_workflow_payload(workflow_name, payload, image_names=None, job_id=None):
 
 def get_upscaleSDXL_payload(workflow, payload, image_names, prefix):
     """ KSampler """
-    workflow["2"]["inputs"]["seed"] = payload["seed"]
-    workflow["2"]["inputs"]["steps"] = payload["steps"]
-    workflow["2"]["inputs"]["cfg"] = payload["cfg_scale"]
-    workflow["2"]["inputs"]["sampler_name"] = payload["sampler_name"]
-    workflow["2"]["inputs"]["scheduler"] = payload["scheduler"]
-    workflow["2"]["inputs"]["denoise"] = payload["denoise"]
+    workflow["12"]["inputs"]["seed"] = payload["seed"]
+    workflow["12"]["inputs"]["steps"] = payload["steps"]
+    workflow["12"]["inputs"]["cfg"] = payload["cfg_scale"]
+    workflow["12"]["inputs"]["sampler_name"] = payload["sampler_name"]
+    workflow["12"]["inputs"]["scheduler"] = payload["scheduler"]
+    workflow["12"]["inputs"]["denoise"] = payload["denoise"]
     
     """ Checkpoint"""
     workflow["1"]["inputs"]["ckpt_name"] = payload["ckpt_name"]
