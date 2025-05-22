@@ -5,6 +5,9 @@ import os
 
 from googleapiclient.errors import HttpError
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
