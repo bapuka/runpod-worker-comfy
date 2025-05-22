@@ -969,7 +969,7 @@ def handler(event):
                             if gdrive_path:
                                 # service_account_file = 'bookymn-6c6fd97214c2.json'
                                 
-                                from upload import upload_image_to_drive()
+                                from upload import upload_image_to_drive
                                 upload_image_to_drive(None, image_path, gdrive_path)
                                 # Upload the image to Google Drive
                                 
