@@ -966,6 +966,7 @@ def handler(event):
                                 img.save(output, format='PNG')
                                 images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
                                 # output.close()
+                            # if google drive path is provided, upload the image to Google Drive
                             if gdrive_path:
                                 # service_account_file = 'bookymn-6c6fd97214c2.json'
                                 
