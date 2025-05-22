@@ -2,7 +2,7 @@ runpod
 Pillow
 PyYAML
 google-api-python-client
-dotenv
+python-dotenv
 # addict
 # future
 # insightface>=0.7.3
