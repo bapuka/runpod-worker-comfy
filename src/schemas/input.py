@@ -30,13 +30,13 @@ INPUT_SCHEMA = {
     "batchId": {
         'type': str,
         'required': False,
-        # 'default': "",
+        'default': "",
         'description': 'Unique identifier for batch processing. When provided, images will be uploaded only once per batch.'
     },
     "gdrivePath": {
         'type': str,
         'required': False,
-        # 'default': "",
+        'default': "",
         'description': 'Google Drive path for saving images. If provided, images will be saved to this path.'
     }
 }

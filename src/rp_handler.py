@@ -855,7 +855,7 @@ def handler(event):
         # Handle case where batch_id is "undefined"
         if batch_id == "undefined":
             rp_logger.info("Client sent batchId: undefined, treating as no batch ID", job_id)
-            batch_id = None
+            batch_id = ""
         
         # Clean up any inactive batches
         clean_inactive_batches()
