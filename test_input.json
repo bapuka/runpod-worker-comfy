@@ -14,6 +14,7 @@
       "height": 1168,
       "prompt": "score_9, score_8_up, score_7_up, (a 5 year old little Asian girl:1.5) black hair with pigtails, chubby, wearing cozy winter pajamas, (detailed facial features:1.3), sparkly eager eyes, in (cozy bedroom:1.5), magical computer mouse (gleaming with ethereal blue aura:1.3), floating slightly above table, (soft glowing red button:1.2), (magical sparkles in blue and silver:1.3), minecraft blocks floating around as particles, warm home interior background, mystical atmosphere, mood is cozy,detailed artwork, Ghibli style, childrens book illustration, inkscape, whimsical, perfect details, 8k, with incredible vibrant colors, ray tracing, dynamic epic composition, blur background,",
       "negative_prompt":  ""
-    }
+    },
+    "gdrivePath": "bookTest-01/chapter_1"
   }
 }

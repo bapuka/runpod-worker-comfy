@@ -833,6 +833,7 @@ def handler(event):
         workflow = validated_data["workflow"]
         payload = validated_data['payload']
         images = validated_data['images'] if 'images' in validated_data else []
+        gdrive_path = validated_data['gdrivePath']
         
         if workflow == 'default':
             workflow = 'txt2img'
@@ -965,6 +966,13 @@ def handler(event):
                                 img.save(output, format='PNG')
                                 images.append(base64.b64encode(output.getvalue()).decode('utf-8'))
                                 # output.close()
+                            if gdrive_path:
+                                # service_account_file = 'bookymn-6c6fd97214c2.json'
+                                
+                                from upload import upload_image_to_drive()
+                                upload_image_to_drive(None, image_path, gdrive_path)
+                                # Upload the image to Google Drive
+                                
                             # with open(image_path, 'rb') as image_file:                            
                             #     images.append(base64.b64encode(image_file.read()).decode('utf-8'))
 

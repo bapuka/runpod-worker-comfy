@@ -1,6 +1,7 @@
 runpod
 Pillow
 PyYAML
+google-api-python-client
 # addict
 # future
 # insightface>=0.7.3
