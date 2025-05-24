@@ -366,7 +366,7 @@ def upload_image_to_drive(folder_id, image_path, folder_path=None):
     # print(f"Found {len(image_files)} images to upload")
     
     file_metadata = {
-            'name': image_path,
+            'name': image_path[image_path.rindex('/') + 1:],  # Get the file name from the path
             'parents': [target_folder_id]
         }
         
