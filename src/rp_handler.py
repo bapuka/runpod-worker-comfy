@@ -454,17 +454,19 @@ def is_valid_image(image_data):
     except Exception:
         return False
 
-def upload_images(images, batch_id=None):
+def upload_images(images, batch_id=None, job_id=None):
     """
     Upload a list of base64 encoded images to the ComfyUI server using the /upload/image endpoint.
     Automatically converts all images to PNG format to ensure compatibility with ComfyUI.
     
     If batch_id is provided, it will check if images have already been uploaded for this batch
-    and reuse them instead of uploading again.
+    and reuse them instead of uploading again. If no batch_id is provided, job_id will be used
+    to make image names unique per job.
 
     Args:
         images (list): A list of dictionaries, each containing the 'name' of the image and the 'image' as a base64 encoded string.
         batch_id (str, optional): A unique identifier for batch processing. If provided, images will only be uploaded once per batch.
+        job_id (str, optional): A unique identifier for single job processing. Used when batch_id is not provided.
 
     Returns:
         dict: A dictionary containing upload status, messages, and updated filenames.
@@ -519,6 +521,18 @@ def upload_images(images, batch_id=None):
         original_name = image["name"]
         name = original_name  # Start with the original name
         image_data = image["image"]
+        
+        # Make image names unique using batch_id or job_id
+        if batch_id and batch_id != "undefined":
+            # For batch jobs, use batch_id as prefix
+            name_without_ext = original_name.rsplit('.', 1)[0] if '.' in original_name else original_name
+            ext = original_name.rsplit('.', 1)[1] if '.' in original_name else ''
+            name = f"{batch_id}_{name_without_ext}.{ext}" if ext else f"{batch_id}_{name_without_ext}"
+        elif job_id:
+            # For single jobs, use job_id as prefix
+            name_without_ext = original_name.rsplit('.', 1)[0] if '.' in original_name else original_name
+            ext = original_name.rsplit('.', 1)[1] if '.' in original_name else ''
+            name = f"{job_id}_{name_without_ext}.{ext}" if ext else f"{job_id}_{name_without_ext}"
         
         # Strip MIME type prefix if present (e.g., "data:image/webp;base64,")
         if ';base64,' in image_data:
@@ -671,135 +685,135 @@ def get_filenames(output):
         if 'images' in value and isinstance(value['images'], list):
             return value['images']
 
-def handle_python_upscaler(image_names, job_id):
-    """
-    Handle the Python server upscaler functionality.
+# def handle_python_upscaler(image_names, job_id):
+#     """
+#     Handle the Python server upscaler functionality.
     
-    Args:
-        image_names (list): List of image names to upscale
-        job_id (str): The job ID for logging
+#     Args:
+#         image_names (list): List of image names to upscale
+#         job_id (str): The job ID for logging
         
-    Returns:
-        dict: A dictionary containing the upscaled images
-    """
-    try:
-        # Use absolute import instead of relative import
-        import sys
-        import os
-        import subprocess
+#     Returns:
+#         dict: A dictionary containing the upscaled images
+#     """
+#     try:
+#         # Use absolute import instead of relative import
+#         import sys
+#         import os
+#         import subprocess
         
-        # More comprehensive approach to handle the virtual environment
-        # First, try to find the Python version used in the venv
-        venv_path = '/ComfyUI/venv'
+#         # More comprehensive approach to handle the virtual environment
+#         # First, try to find the Python version used in the venv
+#         venv_path = '/ComfyUI/venv'
         
-        # Check if the venv directory exists
-        if not os.path.exists(venv_path):
-            rp_logger.error(f"ComfyUI venv directory not found: {venv_path}", job_id)
-            raise RuntimeError(f"ComfyUI venv directory not found: {venv_path}")
+#         # Check if the venv directory exists
+#         if not os.path.exists(venv_path):
+#             rp_logger.error(f"ComfyUI venv directory not found: {venv_path}", job_id)
+#             raise RuntimeError(f"ComfyUI venv directory not found: {venv_path}")
         
-        # Try to find the Python executable in the venv
-        venv_python = os.path.join(venv_path, 'bin', 'python')
-        if not os.path.exists(venv_python):
-            rp_logger.error(f"Python executable not found in venv: {venv_python}", job_id)
-            raise RuntimeError(f"Python executable not found in venv: {venv_python}")
+#         # Try to find the Python executable in the venv
+#         venv_python = os.path.join(venv_path, 'bin', 'python')
+#         if not os.path.exists(venv_python):
+#             rp_logger.error(f"Python executable not found in venv: {venv_python}", job_id)
+#             raise RuntimeError(f"Python executable not found in venv: {venv_python}")
         
-        # Get the Python version from the venv
-        try:
-            python_version_cmd = f"{venv_python} --version"
-            python_version_output = subprocess.check_output(python_version_cmd, shell=True, text=True)
-            rp_logger.info(f"Venv Python version: {python_version_output.strip()}", job_id)
-        except subprocess.CalledProcessError as e:
-            rp_logger.error(f"Failed to get Python version from venv: {e}", job_id)
+#         # Get the Python version from the venv
+#         try:
+#             python_version_cmd = f"{venv_python} --version"
+#             python_version_output = subprocess.check_output(python_version_cmd, shell=True, text=True)
+#             rp_logger.info(f"Venv Python version: {python_version_output.strip()}", job_id)
+#         except subprocess.CalledProcessError as e:
+#             rp_logger.error(f"Failed to get Python version from venv: {e}", job_id)
         
-        # Try to execute the upscaler using the venv Python directly
-        try:
-            rp_logger.info(f"Executing upscaler using venv Python directly", job_id)
+#         # Try to execute the upscaler using the venv Python directly
+#         try:
+#             rp_logger.info(f"Executing upscaler using venv Python directly", job_id)
             
-            # Create a temporary script to import and run the upscaler
-            temp_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp_upscaler.py')
-            with open(temp_script_path, 'w') as f:
-                f.write(f'''
-import sys
-import os
-from upscaler import queue
+#             # Create a temporary script to import and run the upscaler
+#             temp_script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'temp_upscaler.py')
+#             with open(temp_script_path, 'w') as f:
+#                 f.write(f'''
+# import sys
+# import os
+# from upscaler import queue
 
-# Log the Python path for debugging
-print("Python path:", sys.path)
+# # Log the Python path for debugging
+# print("Python path:", sys.path)
 
-# Run the upscaler
-result = queue("{image_names[0]}", 4)
-print("Upscaler result:", result)
-''')
+# # Run the upscaler
+# result = queue("{image_names[0]}", 4)
+# print("Upscaler result:", result)
+# ''')
             
-            # Execute the script with the venv Python
-            cmd = f"{venv_python} {temp_script_path}"
-            rp_logger.info(f"Executing command: {cmd}", job_id)
-            result = subprocess.check_output(cmd, shell=True, text=True)
-            rp_logger.info(f"Upscaler output: {result}", job_id)
+#             # Execute the script with the venv Python
+#             cmd = f"{venv_python} {temp_script_path}"
+#             rp_logger.info(f"Executing command: {cmd}", job_id)
+#             result = subprocess.check_output(cmd, shell=True, text=True)
+#             rp_logger.info(f"Upscaler output: {result}", job_id)
             
-            # Clean up the temporary script
-            os.remove(temp_script_path)
+#             # Clean up the temporary script
+#             os.remove(temp_script_path)
             
-            # Parse the result from the output
-            # This is a simple approach - you might need to adjust based on the actual output format
-            import re
-            match = re.search(r"Upscaler result: (.*)", result)
-            if match:
-                response = eval(match.group(1))  # Be careful with eval - only use with trusted input
-                rp_logger.info(f'Upscaling completed successfully', job_id)
-                return {
-                    'images': response
-                }
-            else:
-                raise RuntimeError("Could not parse upscaler result from output")
-        except Exception as e:
-            rp_logger.error(f'Error executing upscaler with venv Python: {e}', job_id)
-            rp_logger.info(f'Falling back to direct import method', job_id)
+#             # Parse the result from the output
+#             # This is a simple approach - you might need to adjust based on the actual output format
+#             import re
+#             match = re.search(r"Upscaler result: (.*)", result)
+#             if match:
+#                 response = eval(match.group(1))  # Be careful with eval - only use with trusted input
+#                 rp_logger.info(f'Upscaling completed successfully', job_id)
+#                 return {
+#                     'images': response
+#                 }
+#             else:
+#                 raise RuntimeError("Could not parse upscaler result from output")
+#         except Exception as e:
+#             rp_logger.error(f'Error executing upscaler with venv Python: {e}', job_id)
+#             rp_logger.info(f'Falling back to direct import method', job_id)
             
-            # Add the current directory to sys.path if not already there
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            if current_dir not in sys.path:
-                sys.path.append(current_dir)
+#             # Add the current directory to sys.path if not already there
+#             current_dir = os.path.dirname(os.path.abspath(__file__))
+#             if current_dir not in sys.path:
+#                 sys.path.append(current_dir)
             
-            # Try to find and add the site-packages directory from the venv
-            site_packages_paths = [
-                os.path.join(venv_path, 'lib', 'python3.10', 'site-packages'),
-                os.path.join(venv_path, 'lib', 'python3.9', 'site-packages'),
-                os.path.join(venv_path, 'lib', 'python3.8', 'site-packages'),
-                os.path.join(venv_path, 'lib', 'python3.7', 'site-packages'),
-                os.path.join(venv_path, 'lib', 'python3', 'site-packages'),
-                os.path.join(venv_path, 'lib64', 'python3.10', 'site-packages'),
-                os.path.join(venv_path, 'lib64', 'python3.9', 'site-packages'),
-                os.path.join(venv_path, 'lib64', 'python3.8', 'site-packages'),
-                os.path.join(venv_path, 'lib64', 'python3.7', 'site-packages'),
-                os.path.join(venv_path, 'lib64', 'python3', 'site-packages')
-            ]
+#             # Try to find and add the site-packages directory from the venv
+#             site_packages_paths = [
+#                 os.path.join(venv_path, 'lib', 'python3.10', 'site-packages'),
+#                 os.path.join(venv_path, 'lib', 'python3.9', 'site-packages'),
+#                 os.path.join(venv_path, 'lib', 'python3.8', 'site-packages'),
+#                 os.path.join(venv_path, 'lib', 'python3.7', 'site-packages'),
+#                 os.path.join(venv_path, 'lib', 'python3', 'site-packages'),
+#                 os.path.join(venv_path, 'lib64', 'python3.10', 'site-packages'),
+#                 os.path.join(venv_path, 'lib64', 'python3.9', 'site-packages'),
+#                 os.path.join(venv_path, 'lib64', 'python3.8', 'site-packages'),
+#                 os.path.join(venv_path, 'lib64', 'python3.7', 'site-packages'),
+#                 os.path.join(venv_path, 'lib64', 'python3', 'site-packages')
+#             ]
             
-            for path in site_packages_paths:
-                if os.path.exists(path) and path not in sys.path:
-                    sys.path.insert(0, path)
-                    rp_logger.info(f'Added venv site-packages to Python path: {path}', job_id)
+#             for path in site_packages_paths:
+#                 if os.path.exists(path) and path not in sys.path:
+#                     sys.path.insert(0, path)
+#                     rp_logger.info(f'Added venv site-packages to Python path: {path}', job_id)
             
-            # Import the queue function from upscaler module
-            from upscaler import queue
+#             # Import the queue function from upscaler module
+#             from upscaler import queue
             
-            # Log the upscaling process
-            rp_logger.info(f'Starting upscaling process with image: {image_names[0]}', job_id)
+#             # Log the upscaling process
+#             rp_logger.info(f'Starting upscaling process with image: {image_names[0]}', job_id)
             
-            # Call the queue function with the first image name and scale factor 4
-            response = queue(image_names[0], 4)
+#             # Call the queue function with the first image name and scale factor 4
+#             response = queue(image_names[0], 4)
             
-            rp_logger.info(f'Upscaling completed successfully', job_id)
+#             rp_logger.info(f'Upscaling completed successfully', job_id)
             
-            return {
-                'images': response
-            }
-    except ImportError as e:
-        rp_logger.error(f'Failed to import upscaler module: {e}', job_id)
-        raise RuntimeError(f'Failed to import upscaler module: {e}')
-    except Exception as e:
-        rp_logger.error(f'Error in Python server: {e}', job_id)
-        raise RuntimeError(f'Error in Python server: {e}')
+#             return {
+#                 'images': response
+#             }
+#     except ImportError as e:
+#         rp_logger.error(f'Failed to import upscaler module: {e}', job_id)
+#         raise RuntimeError(f'Failed to import upscaler module: {e}')
+#     except Exception as e:
+#         rp_logger.error(f'Error in Python server: {e}', job_id)
+#         raise RuntimeError(f'Error in Python server: {e}')
 
 def handler(event):
     """
@@ -868,7 +882,7 @@ def handler(event):
         
         # Upload images if they exist and track the updated filenames
         # If batchId is provided, it will be used to reuse previously uploaded images
-        upload_result = upload_images(images, batch_id)
+        upload_result = upload_images(images, batch_id, job_id)
         if upload_result["status"] == "error":
             return upload_result
         
