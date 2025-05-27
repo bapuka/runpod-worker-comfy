@@ -1,5 +1,5 @@
 # Stage 1: Base image with common dependencies
-FROM nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04 as base
+FROM python:3.12-slim-bullseye as base
 
 # Prevents prompts from packages asking for user input during installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -7,11 +7,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PIP_PREFER_BINARY=1
 # Ensures output from python is printed immediately to the terminal without buffering
 ENV PYTHONUNBUFFERED=1 
+ENV PYTHONDONTWRITEBYTECODE=1
 
 # Install Python, git and other necessary tools
 RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip \
+    curl \   
     git \
     wget
 
@@ -21,59 +21,13 @@ RUN apt-get install -y libgl1-mesa-glx libglib2.0-0
 # Clean up to reduce image size
 RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-# Clone ComfyUI repository
-RUN git clone https://github.com/comfyanonymous/ComfyUI.git /comfyui
+ENV COMFYUI_PATH="/ComfyUI"
+ENV PYTHONPATH="${COMFYUI_PATH}:$PYTHONPATH"
+
+ENV PATH="${COMFYUI_PATH}:$PATH"
 
 # Change working directory to ComfyUI
-WORKDIR /comfyui
-
-# Install ComfyUI dependencies
-RUN pip3 install --upgrade --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121 \
-    && pip3 install --no-cache-dir xformers==0.0.23 --index-url https://download.pytorch.org/whl/cu121 \
-    && pip3 install --no-cache-dir insightface lark compel onnxruntime-gpu bitsandbytes python-dotenv \
-    && pip3 install --upgrade -r requirements.txt
-
-# Install runpod
-RUN pip3 install runpod requests
-
-# Install custom nodes
-
-WORKDIR /comfyui/custom_nodes
-
-RUN git clone https://github.com/ntdviet/comfyui-ext.git
-RUN cp ./comfyui-ext/custom_nodes/gcLatentTunnel/gcLatentTunnel.py .
-RUN rm -rf comfyui-ext
-RUN ls -la
-RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Manager.git
-RUN cd ComfyUI-Manager && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git
-RUN cd rgthree-comfy && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/griptape-ai/ComfyUI-Griptape.git
-RUN cd ComfyUI-Griptape && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git
-RUN cd ComfyUI-Impact-Pack && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/WASasquatch/was-node-suite-comfyui
-RUN cd was-node-suite-comfyui && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_IPAdapter_plus.git
-RUN git clone --depth 1 https://github.com/cubiq/ComfyUI_InstantID.git
-RUN cd ComfyUI_InstantID && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/cubiq/PuLID_ComfyUI.git
-RUN cd PuLID_ComfyUI && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/Gourieff/comfyui-reactor-node.git
-RUN cd comfyui-reactor-node && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/Extraltodeus/ComfyUI-AutomaticCFG.git
-RUN cd ComfyUI-AutomaticCFG && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/Extraltodeus/pre_cfg_comfy_nodes_for_ComfyUI.git
-RUN git clone --depth 1 https://github.com/crystian/ComfyUI-Crystools.git
-RUN cd ComfyUI-Crystools && pip3 install -r requirements.txt
-RUN git clone --depth 1 https://github.com/XLabs-AI/x-flux-comfyui.git
-RUN cd x-flux-comfyui && python3 setup.py
-RUN git clone https://github.com/Fannovel16/comfyui_controlnet_aux.git
-RUN cd comfyui_controlnet_aux && pip3 install -r requirements.txt
-
-
-WORKDIR /comfyui
-
+WORKDIR /ComfyUI
 # Support for the network volume
 ADD src/extra_model_paths.yaml ./
 

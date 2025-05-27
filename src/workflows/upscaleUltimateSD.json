@@ -1,7 +1,7 @@
 {
   "1": {
     "inputs": {
-      "hard_mode": false,
+      "hard_mode": true,
       "boost": true,
       "model": [
         "7",
@@ -21,7 +21,7 @@
       "cfg": 8,
       "sampler_name": "dpmpp_2m_sde_gpu",
       "scheduler": "karras",
-      "denoise": 0.09000000000000002,
+      "denoise": 0.14,
       "mode_type": "Linear",
       "tile_width": 512,
       "tile_height": 512,
