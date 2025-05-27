@@ -67,7 +67,7 @@ else
     cd /runpod-volume/ComfyUI
     source venv/bin/activate
     python3 main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
-    deactivate
+    # deactivate
     
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u /rp_handler.py
