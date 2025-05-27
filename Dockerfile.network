@@ -40,7 +40,8 @@ ARG OPENAI_API_KEY
 # Copy runpod scripts
 COPY src/schemas ./schemas
 COPY src/workflows ./workflows
-ADD src/start.sh src/rp_handler.py src/upscaler.py src/upload.py ./
+ADD src/start-network.sh ./start.sh 
+ADD src/rp_handler.py src/upscaler.py src/upload.py ./
 RUN chmod +x /start.sh
 
 # Start the container
