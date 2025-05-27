@@ -1,28 +1,12 @@
 #!/usr/bin/env bash
 
-import os
-import sys
-from pathlib import Path
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
 export PYTHONUNBUFFERED=true
 export HF_HOME="/"
 
-# Add ComfyUI to Python path
-if COMFYUI_PATH not in sys.path:
-    sys.path.insert(0, COMFYUI_PATH)
-
-# Add venv if exists
-if os.path.exists(f"{VENV_PATH}/lib/python3.11/site-packages"):
-    venv_site = f"{VENV_PATH}/lib/python3.11/site-packages"
-    if venv_site not in sys.path:
-        sys.path.insert(0, venv_site)
-
 # Set environment
-os.environ['COMFYUI_PATH'] = COMFYUI_PATH
-print(f"ComfyUI environment setup complete: {COMFYUI_PATH}")
-
 # Debug: List directory structure to help diagnose path issues
 echo "runpod-worker-comfy: Listing root directory structure"
 ls -la /runpod-volume/ComfyUI
@@ -80,7 +64,7 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
     python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
     echo "runpod-worker-comfy: Starting ComfyUI"    
-    cd /ComfyUI
+    cd /runpod-volume/ComfyUI
     source venv/bin/activate
     python3 main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
     deactivate
