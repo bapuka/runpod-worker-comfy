@@ -259,16 +259,50 @@ def get_workflow_payload(workflow_name, payload, image_names=None, job_id=None):
 
     if workflow_name == 'img2imgPersona':
         workflow = get_img2imgPersona_payload(workflow, payload, image_names, job_id)
-        rp_logger.info(f'Workflow payload for {workflow_name} generated successfully', job_id)
+        rp_logger.info(f'Workflow payload for {workflow_name} loaded successfully', job_id)
         
     if workflow_name == 'txt2imgSceneSDXL':
         workflow = get_txt2imgSceneSDXL_payload(workflow, payload, job_id)
-        rp_logger.info(f'Workflow payload for {workflow_name} generated successfully', job_id)
+        rp_logger.info(f'Workflow payload for {workflow_name} loaded successfully', job_id)
         
     if workflow_name == 'upscaleSDXL':
         workflow = get_upscaleSDXL_payload(workflow, payload, image_names, job_id)
-        rp_logger.info(f'Workflow payload for {workflow_name} generated successfully', job_id)
+        rp_logger.info(f'Workflow payload for {workflow_name} loaded successfully', job_id)
+        
+    if workflow_name == 'upscaleUltimateSD':
+        workflow = get_upscaleUltimateSD_payload(workflow, payload, image_names, job_id)
+        rp_logger.info(f'Workflow payload for {workflow_name} loaded successfully', job_id)
 
+    return workflow
+
+def get_upscaleUltimateSD_payload(workflow, payload, image_names, prefix):
+    """ Ultimate SD Upscale """
+    workflow["2"]["inputs"]["seed"] = payload["seed"]
+    workflow["2"]["inputs"]["steps"] = payload["steps"]
+    workflow["2"]["inputs"]["cfg"] = payload["cfg_scale"]
+    workflow["2"]["inputs"]["sampler_name"] = payload["sampler_name"]
+    workflow["2"]["inputs"]["scheduler"] = payload["scheduler"]
+    workflow["2"]["inputs"]["denoise"] = payload["denoise"]
+    workflow["2"]["inputs"]["upscale_by"] = payload["upscale_by"]
+    
+    """ Checkpoint"""
+    workflow["7"]["inputs"]["ckpt_name"] = payload["ckpt_name"]
+    """ Positive prompt """
+    workflow["8"]["inputs"]["width"] = payload["width"]
+    workflow["8"]["inputs"]["height"] = payload["height"]
+    workflow["8"]["inputs"]["target_width"] = payload["width"]
+    workflow["8"]["inputs"]["target_height"] = payload["height"]
+    workflow["8"]["inputs"]["text"] = payload["prompt"]
+    """ Negative prompt """
+    workflow["9"]["inputs"]["width"] = payload["width"]
+    workflow["9"]["inputs"]["height"] = payload["height"]
+    workflow["9"]["inputs"]["target_width"] = payload["width"]
+    workflow["9"]["inputs"]["target_height"] = payload["height"]
+    workflow["9"]["inputs"]["text"] = payload["negative_prompt"]
+    """ LoadImage """
+    workflow["10"]["inputs"]["image"] = image_names[0]    
+    """ SaveImage """    
+    workflow["15"]["inputs"]["filename_prefix"] = prefix
     return workflow
 
 def get_upscaleSDXL_payload(workflow, payload, image_names, prefix):
@@ -916,19 +950,21 @@ def handler(event):
                 rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
                 raise
             
-        if workflow == 'upscaleSDXL':
+        if workflow == 'upscaleSDXL' or workflow == 'upscaleUltimateSD':
             try:
                 payload = get_workflow_payload(workflow, payload, updated_image_names, job_id)
             except Exception as e:
                 rp_logger.error(f'Unable to load workflow payload for: {workflow}', job_id)
                 raise
+            
+            
         # If a batchId is provided, mark it as processing
         if batch_id:
             update_batch_status(batch_id, 'processing')
         
-        if server_type == 'python':    
-            return handle_python_upscaler(updated_image_names, job_id)
-        elif server_type == 'comfyui':
+        # if server_type == 'python':    
+        #     return handle_python_upscaler(updated_image_names, job_id)
+        if server_type == 'comfyui':
             queue_response = send_post_request(
                 'prompt',
                 {
