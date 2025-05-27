@@ -22,7 +22,7 @@ print(f"ComfyUI environment setup complete: {COMFYUI_PATH}")
 
 # Debug: List directory structure to help diagnose path issues
 echo "runpod-worker-comfy: Listing root directory structure"
-ls -la /ComfyUI
+ls -la /runpod-volume/ComfyUI
 echo "runpod-worker-comfy: Listing workflows directory"
 ls -la /workflows
 
