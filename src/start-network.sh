@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+import os
+import sys
+from pathlib import Path
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
@@ -86,5 +89,32 @@ else
     python3 -u /rp_handler.py
 fi
 
+# Test handler for development
+def test_handler():
+    """Test the handler locally"""
+    print("=== Testing ComfyUI Handler ===")
+    
+    # Test system info
+    print("\nSystem Info:")
+    info = get_comfyui_info()
+    for key, value in info.items():
+        print(f"  {key}: {value}")
+    
+    # Test basic workflow (you'd replace this with a real workflow)
+    test_event = {
+        "input": {
+            "workflow": {},  # Add your test workflow here
+            "output_format": "base64"
+        }
+    }
+    
+    print("\nTesting workflow execution...")
+    # Uncomment to test with real workflow
+    # result = handler(test_event)
+    # print(f"Result: {result['status']}")
+    
+    print("Handler test complete!")
+
+test_handler()
 echo "Start script(s) finished, pod is ready to use."
 sleep infinity
