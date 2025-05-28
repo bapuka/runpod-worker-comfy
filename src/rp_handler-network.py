@@ -1,3 +1,11 @@
+import sys
+
+sys.path.append('/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages')
+import runpod
+from runpod.serverless.utils.rp_validator import validate
+from runpod.serverless.utils import rp_upload
+from runpod.serverless.modules.rp_logger import RunPodLogger
+from PIL import Image
 from requests.adapters import HTTPAdapter, Retry
 from schemas.input import INPUT_SCHEMA
 import logging
@@ -11,16 +19,10 @@ import os
 import requests
 import base64
 from io import BytesIO
-from PIL import Image
+
 import re
 from collections import defaultdict
-import sys
 
-sys.path.append('/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages')
-import runpod
-from runpod.serverless.utils.rp_validator import validate
-from runpod.serverless.utils import rp_upload
-from runpod.serverless.modules.rp_logger import RunPodLogger
 
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50

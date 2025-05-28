@@ -69,6 +69,7 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
 else
     echo "runpod-worker-comfy: Starting ComfyUI"    
     cd /runpod-volume/ComfyUI
+    export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
     source venv/bin/activate 
     echo "VIRTUAL_ENV: $VIRTUAL_ENV"
     echo "Python path: $(which python)"
