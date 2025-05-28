@@ -115,7 +115,7 @@ else
     # This is crucial for making the `conda` command available and initializing the base environment.
     # Make sure this path is correct for your Miniconda installation on network storage.
     echo "Sourcing Conda initialization..."
-    source /workspace/miniconda3/etc/profile.d/conda.sh
+    source /runpod-volume/miniconda3/etc/profile.d/conda.sh
 
     # 2. Activate your specific Conda environment for ComfyUI
     echo "Activating 'comfyui' Conda environment..."
@@ -123,7 +123,7 @@ else
 
     # 3. Navigate to your ComfyUI directory on network storage
     echo "Navigating to ComfyUI directory..."
-    cd /workspace/ComfyUI
+    cd /runpod-volume/ComfyUI
 
     # export VIRTUAL_ENV="/runpod-volume/ComfyUI/venv"
     echo "runpod-worker-comfy: Starting ComfyUI"    
