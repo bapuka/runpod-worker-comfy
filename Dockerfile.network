@@ -41,7 +41,8 @@ ARG OPENAI_API_KEY
 COPY src/schemas ./schemas
 COPY src/workflows ./workflows
 ADD src/start-network.sh ./start.sh 
-ADD src/rp_handler.py src/upscaler.py src/upload.py ./
+ADD src/rp_handler-network.py ./rp_handler.py 
+ADD src/upscaler.py src/upload.py ./
 RUN chmod +x /start.sh
 
 # Start the container

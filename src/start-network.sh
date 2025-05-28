@@ -58,19 +58,18 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
     cd /ComfyUI
     source venv/bin/activate
     python3 main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
-    deactivate
+    # deactivate
     
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
     echo "runpod-worker-comfy: Starting ComfyUI"    
     cd /runpod-volume/ComfyUI
-    source venv/bin/activate
-    python3 main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
-    # deactivate
-    
+    source venv/bin/activate 
+    pip list | grep runpod > /dev/null || pip install -U runpod
+    /runpod-volume/ComfyUI/venv/bin/python3 main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
     echo "runpod-worker-comfy: Starting RunPod Handler"
-    python3 -u /rp_handler.py
+    /runpod-volume/ComfyUI/venv/bin/python3 -u /rp_handler.py
 fi
 
 # Test handler for development
