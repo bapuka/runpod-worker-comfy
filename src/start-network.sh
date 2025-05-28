@@ -17,6 +17,45 @@ ls -la /runpod-volume
 echo "runpod-worker-comfy: Listing workflows directory"
 ls -la /workflows
 
+# Configuration
+COMFYUI_NETWORK_PATH="/runpod-volume/ComfyUI"
+VENV_PATH="${COMFYUI_NETWORK_PATH}/venv"
+CONTAINER_COMFYUI_PATH="/ComfyUI"
+
+# --- Pre-flight Checks ---
+echo "Checking for ComfyUI installation on network storage..."
+if [ ! -d "$COMFYUI_NETWORK_PATH" ]; then
+    echo "ERROR: ComfyUI directory not found at $COMFYUI_NETWORK_PATH."
+    echo "Please ensure your ComfyUI installation is at the root of your network storage, under a folder named 'comfyui'."
+    exit 1
+fi
+
+echo "Checking for ComfyUI virtual environment..."
+if [ ! -d "$VENV_PATH" ]; then
+    echo "ERROR: Virtual environment not found at $VENV_PATH."
+    echo "Please ensure your venv is located at $COMFYUI_NETWORK_PATH/venv."
+    exit 1
+fi
+
+# --- Setup ---
+echo "Creating a symbolic link to ComfyUI from network storage..."
+# We create a symlink so ComfyUI thinks it's in /comfyui within the container.
+# This avoids copying large files and uses the existing installation directly.
+ln -sfn "$COMFYUI_NETWORK_PATH" "$CONTAINER_COMFYUI_PATH"
+
+echo "Activating ComfyUI's virtual environment..."
+source "${VENV_PATH}/bin/activate"
+
+# --- ComfyUI Specific Setup (Optional but Recommended) ---
+# Set paths for models and custom nodes if they are also on network storage
+# This assumes your models are in /runpod-volume/comfyui/models (standard location)
+# If your models are in a different location on network storage, adjust these paths.
+# For example, if you have a shared models folder at /runpod-volume/models_shared
+# then set these env vars accordingly.
+export COMFYUI_ROOT="$CONTAINER_COMFYUI_PATH"
+export COMFYUI_OUTPUT_DIR="${CONTAINER_COMFYUI_PATH}/output" # Or your desired output directory
+export COMFYUI_TEMP_DIR="${CONTAINER_COMFYUI_PATH}/temp"
+
 # Ensure workflows are accessible from the expected location
 echo "runpod-worker-comfy: Setting up workflows directory"
 
@@ -68,11 +107,12 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
     python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
     
-    export VIRTUAL_ENV="/runpod-volume/ComfyUI/venv/bin/python"
-    echo "runpod-worker-comfy: Starting ComfyUI"    
-    cd /runpod-volume/ComfyUI
-    export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
-    source venv/bin/activate 
+    # export VIRTUAL_ENV="/runpod-volume/ComfyUI/venv/bin/python"
+    # echo "runpod-worker-comfy: Starting ComfyUI"    
+    # cd /runpod-volume/ComfyUI
+    # export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
+    # source venv/bin/activate 
+    cd "$CONTAINER_COMFYUI_PATH"
     echo "VIRTUAL_ENV: $VIRTUAL_ENV"
     echo "Python path: $(which python)"
     echo "Pip list:"
