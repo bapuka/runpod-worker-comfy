@@ -10,7 +10,7 @@ ln -sfn "/runpod-volume" "/workspace"
 ln -sfn "/runpod-volume/miniconda3" "/workspace/miniconda3"
 ln -sfn "/runpod-volume/logs" "/workspace/logs"
 
-NETWORK_STORAGE_PATH="/workspace"
+NETWORK_STORAGE_PATH="/runpod-volume"
 COMFYUI_DIR="$NETWORK_STORAGE_PATH/ComfyUI"
 cp /tmp/extra_model_paths.yaml "$COMFYUI_DIR/extra_model_paths.yaml"
 # Set environment
