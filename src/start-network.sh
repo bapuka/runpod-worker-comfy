@@ -107,10 +107,10 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
     python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
     
-    # export VIRTUAL_ENV="/runpod-volume/ComfyUI/venv/bin/python"
-    # echo "runpod-worker-comfy: Starting ComfyUI"    
+    export VIRTUAL_ENV="/runpod-volume/ComfyUI/venv"
+    echo "runpod-worker-comfy: Starting ComfyUI"    
     # cd /runpod-volume/ComfyUI
-    # export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
+    export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
     # source venv/bin/activate 
     cd "$CONTAINER_COMFYUI_PATH"
     echo "VIRTUAL_ENV: $VIRTUAL_ENV"
