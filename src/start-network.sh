@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+set -e
 # Use libtcmalloc for better memory management
 TCMALLOC="$(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1)"
 export LD_PRELOAD="${TCMALLOC}"
@@ -45,7 +45,8 @@ ln -sfn "$COMFYUI_NETWORK_PATH" "$CONTAINER_COMFYUI_PATH"
 
 echo "Activating ComfyUI's virtual environment..."
 source "${VENV_PATH}/bin/activate"
-
+echo "Pip list:"
+pip list | head -15
 # --- ComfyUI Specific Setup (Optional but Recommended) ---
 # Set paths for models and custom nodes if they are also on network storage
 # This assumes your models are in /runpod-volume/comfyui/models (standard location)

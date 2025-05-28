@@ -1,5 +1,6 @@
 # Stage 1: Base image with common dependencies
-FROM python:3.11-slim-bullseye AS base
+# FROM python:3.11-slim-bullseye AS base
+FROM pytorch/pytorch:2.5.1-cuda12.1-cudnn9-runtime
 
 # Prevents prompts from packages asking for user input during installation
 ENV DEBIAN_FRONTEND=noninteractive
