@@ -22,13 +22,13 @@ RUN apt-get install -y libgl1-mesa-glx libglib2.0-0
 # Clean up to reduce image size
 RUN apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
-ENV COMFYUI_PATH="/ComfyUI"
-ENV PYTHONPATH="${COMFYUI_PATH}:$PYTHONPATH"
+# ENV COMFYUI_PATH="/ComfyUI"
+# ENV PYTHONPATH="${COMFYUI_PATH}:$PYTHONPATH"
 
-ENV PATH="${COMFYUI_PATH}:$PATH"
+# ENV PATH="${COMFYUI_PATH}:$PATH"
 
 # Change working directory to ComfyUI
-WORKDIR /ComfyUI
+WORKDIR /runpod-volume/ComfyUI
 # Support for the network volume
 ADD src/extra_model_paths.yaml ./
 

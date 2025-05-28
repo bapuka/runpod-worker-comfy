@@ -1109,7 +1109,8 @@ if __name__ == "__main__":
     rp_logger.info(f'./src/workflows directory exists: {os.path.exists("./src/workflows")}')
     
     # List files in current directory
-    rp_logger.info(f'Files in current directory: {os.listdir("/")}')
+    rp_logger.info(f'Files in current directory: {os.listdir("/workspace")}')
+    rp_logger.info(f'Files in current directory: {os.listdir("/runpod-volume")}')
     
     # Try to list files in workflows directory if it exists
     if os.path.exists("/workflows"):

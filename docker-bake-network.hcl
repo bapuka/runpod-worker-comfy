@@ -11,7 +11,7 @@ variable "APP" {
 }
 
 variable "RELEASE" {
-    default = "v0.3.20"
+    default = "v0.3.21"
 }
 
 target "default" {
