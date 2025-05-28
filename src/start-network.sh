@@ -67,6 +67,8 @@ if [ "$SERVE_API_LOCALLY" == "true" ]; then
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python3 -u /rp_handler.py --rp_serve_api --rp_api_host=0.0.0.0
 else
+    deactivate
+    export VIRTUAL_ENV = /runpod-volume/ComfyUI/venv/bin/python
     echo "runpod-worker-comfy: Starting ComfyUI"    
     cd /runpod-volume/ComfyUI
     export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
