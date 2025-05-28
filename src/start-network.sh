@@ -66,6 +66,11 @@ else
     echo "runpod-worker-comfy: Starting ComfyUI"    
     cd /runpod-volume/ComfyUI
     source venv/bin/activate 
+    echo "VIRTUAL_ENV: $VIRTUAL_ENV"
+    echo "Python path: $(which python)"
+    echo "Pip list:"
+    pip list | head -5
+    python -c "import runpod; print('runpod imported successfully')"
     pip list | grep runpod > /dev/null || pip install -U runpod
     /runpod-volume/ComfyUI/venv/bin/python3 main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
     echo "runpod-worker-comfy: Starting RunPod Handler"
