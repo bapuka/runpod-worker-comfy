@@ -117,6 +117,7 @@ else
     # This is crucial for making the `conda` command available and initializing the base environment.
     # Make sure this path is correct for your Miniconda installation on network storage.
     echo "Sourcing Conda initialization..."
+    chmod a+x /runpod-volume/miniconda3/etc/profile.d/conda.sh
     source /runpod-volume/miniconda3/etc/profile.d/conda.sh
 
     # 2. Activate your specific Conda environment for ComfyUI
