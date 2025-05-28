@@ -6,9 +6,13 @@ export LD_PRELOAD="${TCMALLOC}"
 export PYTHONUNBUFFERED=true
 export HF_HOME="/"
 
+ln -sfn "/runpod-volume" "/workspace"
 ln -sfn "/runpod-volume/miniconda3" "/workspace/miniconda3"
 ln -sfn "/runpod-volume/logs" "/workspace/logs"
 
+NETWORK_STORAGE_PATH="/workspace"
+COMFYUI_DIR="$NETWORK_STORAGE_PATH/ComfyUI"
+cp /tmp/extra_model_paths.yaml "$COMFYUI_DIR/extra_model_paths.yaml"
 # Set environment
 # Debug: List directory structure to help diagnose path issues
 echo "runpod-worker-comfy: Listing root directory structure"
@@ -143,7 +147,7 @@ else
     pip list | head -5
     python -c "import runpod; print('runpod imported successfully')"
     pip list | grep runpod > /dev/null || pip install -U runpod
-    python main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /logs/comfyui.log 2>&1 &
+    python main.py --disable-auto-launch --disable-metadata --listen --port 3001 > /runpod-volume/logs/comfyui.log 2>&1 &
     echo "runpod-worker-comfy: Starting RunPod Handler"
     python -u /rp_handler.py
 fi
