@@ -6,6 +6,8 @@ export LD_PRELOAD="${TCMALLOC}"
 export PYTHONUNBUFFERED=true
 export HF_HOME="/"
 
+ln -sfn "/runpod-volume/miniconda3" "/workspace/miniconda3"
+
 # Set environment
 # Debug: List directory structure to help diagnose path issues
 echo "runpod-worker-comfy: Listing root directory structure"
@@ -128,7 +130,7 @@ else
     echo "Navigating to ComfyUI directory..."
     cd /runpod-volume/ComfyUI
 
-    # export VIRTUAL_ENV="/runpod-volume/ComfyUI/venv"
+    # export VIRTUAL_ENV="/runpod-volum e/ComfyUI/venv"
     echo "runpod-worker-comfy: Starting ComfyUI"    
     # cd /runpod-volume/ComfyUI
     # export PYTHONPATH="/runpod-volume/ComfyUI/venv/lib/python3.11/site-packages:$PYTHONPATH"
