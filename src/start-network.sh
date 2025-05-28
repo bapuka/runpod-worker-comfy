@@ -7,6 +7,7 @@ export PYTHONUNBUFFERED=true
 export HF_HOME="/"
 
 ln -sfn "/runpod-volume/miniconda3" "/workspace/miniconda3"
+ln -sfn "/runpod-volume/logs" "/logs"
 
 # Set environment
 # Debug: List directory structure to help diagnose path issues
