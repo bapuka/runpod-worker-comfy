@@ -14,6 +14,8 @@ echo "runpod-worker-comfy: Listing workspace directory"
 ls -la /workspace
 echo "runpod-worker-comfy: Listing network volume directory"
 ls -la /runpod-volume
+echo "runpod-worker-comfy: Listing conda directory"
+ls -la /runpod-volume/miniconda3/etc/profile.d
 echo "runpod-worker-comfy: Listing workflows directory"
 ls -la /workflows
 
