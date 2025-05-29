@@ -971,7 +971,7 @@ def handler(event):
                     'prompt': payload
                 }
             )
-            rp_logger.info(f'Prompt: {payload}', job_id)
+            # rp_logger.info(f'Prompt: {payload}', job_id)
             
             if queue_response.status_code == 200:
                 resp_json = queue_response.json()

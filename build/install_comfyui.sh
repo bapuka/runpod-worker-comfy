@@ -17,15 +17,22 @@ pip3 install --no-cache-dir xformers=="${XFORMERS_VERSION}" --index-url https://
 
 # Install requirements
 pip3 install --no-cache-dir -r requirements.txt
-pip3 install --no-cache-dir accelerate insightface lark compel onnxruntime-gpu bitsandbytes python-dotenv 
+pip3 install --no-cache-dir accelerate insightface lark compel onnxruntime-gpu bitsandbytes python-dotenv
+pip3 install protobuf --upgrade 
 
 # Install runpod
 pip3 install --no-cache-dir runpod requests huggingface_hub 
 
+git lfs install
+git clone --depth 1 https://huggingface.co/kidyu/antelopev2-for-InstantID-ComfyUI /ComfyUI/models/insightface/models/antelopev2
+
+wget https://huggingface.co/netrunner-exe/Insight-Swap-models/resolve/main/inswapper_128.fp16.onnx -O /ComfyUI/models/insightface/inswapper_128.fp16.onnx
+wget https://huggingface.co/ezioruan/inswapper_128.onnx/resolve/main/inswapper_128.onnx -O /ComfyUI/models/insightface/inswapper_128.onnx
+
 # Install ComfyUI Custom Nodes
-git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
-cd custom_nodes/ComfyUI-Manager
-pip3 install -r requirements.txt
+# git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
+# cd custom_nodes/ComfyUI-Manager
+# pip3 install -r requirements.txt
 
 cd /ComfyUI
 git clone https://github.com/ntdviet/comfyui-ext.git custom_nodes/comfyui-ext
@@ -37,10 +44,10 @@ git clone --depth 1 https://github.com/rgthree/rgthree-comfy.git custom_nodes/rg
 cd custom_nodes/rgthree-comfy 
 pip3 install -r requirements.txt
 
-cd /ComfyUI
-git clone --depth 1 https://github.com/griptape-ai/ComfyUI-Griptape.git custom_nodes/ComfyUI-Griptape
-cd custom_nodes/ComfyUI-Griptape 
-pip3 install -r requirements.txt
+# cd /ComfyUI
+# git clone --depth 1 https://github.com/griptape-ai/ComfyUI-Griptape.git custom_nodes/ComfyUI-Griptape
+# cd custom_nodes/ComfyUI-Griptape 
+# pip3 install -r requirements.txt
 
 cd /ComfyUI
 git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack.git custom_nodes/ComfyUI-Impact-Pack
