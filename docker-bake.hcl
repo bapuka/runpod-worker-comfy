@@ -38,6 +38,10 @@ variable "PYTHON_VERSION" {
     default = "3.12"
 }
 
+variable "COMFYUI_VERSION" {
+    default = "0.3.38"
+}
+
 target "default" {
     dockerfile = "Dockerfile.runpod"
     tags = ["${REGISTRY}/${REGISTRY_USER}/${APP}:${RELEASE}.post1"]

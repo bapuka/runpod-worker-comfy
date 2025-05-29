@@ -18,16 +18,16 @@ pip3 install --no-cache-dir xformers=="${XFORMERS_VERSION}" --index-url https://
 # Install requirements
 pip3 install --no-cache-dir -r requirements.txt
 pip3 install --no-cache-dir accelerate insightface lark compel onnxruntime-gpu bitsandbytes python-dotenv
-pip3 install protobuf --upgrade 
+pip3 install --no-cache-dir protobuf --upgrade 
 
 # Install runpod
 pip3 install --no-cache-dir runpod requests huggingface_hub 
 
-git lfs install
-git clone --depth 1 https://huggingface.co/kidyu/antelopev2-for-InstantID-ComfyUI /ComfyUI/models/insightface/models/antelopev2
+# git lfs install
+# git clone --depth 1 https://huggingface.co/kidyu/antelopev2-for-InstantID-ComfyUI /ComfyUI/models/insightface/models/antelopev2
 
-wget https://huggingface.co/netrunner-exe/Insight-Swap-models/resolve/main/inswapper_128.fp16.onnx -O /ComfyUI/models/insightface/inswapper_128.fp16.onnx
-wget https://huggingface.co/ezioruan/inswapper_128.onnx/resolve/main/inswapper_128.onnx -O /ComfyUI/models/insightface/inswapper_128.onnx
+# wget https://huggingface.co/netrunner-exe/Insight-Swap-models/resolve/main/inswapper_128.fp16.onnx -O /ComfyUI/models/insightface/inswapper_128.fp16.onnx
+# wget https://huggingface.co/ezioruan/inswapper_128.onnx/resolve/main/inswapper_128.onnx -O /ComfyUI/models/insightface/inswapper_128.onnx
 
 # Install ComfyUI Custom Nodes
 # git clone https://github.com/ltdrdata/ComfyUI-Manager.git custom_nodes/ComfyUI-Manager
@@ -123,11 +123,16 @@ set +e
 
 echo "Downloading SDXL Refiner"
 cd /ComfyUI/models/checkpoints
-if wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors; then
-    echo "SDXL Refiner downloaded successfully"
-else
-    echo "WARNING: Failed to download SDXL Refiner, but continuing with the build"
+if wget https://civitai.com/api/download/models/656688 --content-disposition -O CHEYENNE_v18.safetensors; then
+    echo "CHEYENNE_v18 downloaded successfully"
+else 
+    echo "WARNING: Failed to download CHEYENNE_v18, but continuing with the build"
 fi
+# if wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors; then
+#     echo "SDXL Refiner downloaded successfully"
+# else
+#     echo "WARNING: Failed to download SDXL Refiner, but continuing with the build"
+# fi
 
 echo "Downloading SDXL VAE"
 cd /ComfyUI/models/vae
