@@ -15,6 +15,21 @@ ls -la /workflows
 # Ensure workflows are accessible from the expected location
 echo "runpod-worker-comfy: Setting up workflows directory"
 
+# Check if /runpod-volume/ComfyUI/models/insightface is mounted
+if [ -d "/runpod-volume/ComfyUI/models/insightface" ]; then
+    echo "runpod-worker-comfy: /runpod-volume/ComfyUI/models/insightface is mounted"
+
+    # Create a soft link to /ComfyUI/models/insightface if it doesn't exist
+    if [ ! -L "/ComfyUI/models/insightface" ]; then
+        ln -s /runpod-volume/ComfyUI/models/insightface /ComfyUI/models/insightface
+        echo "Created symlink for /ComfyUI/models/insightface"
+    else 
+        echo "Soft link already exists."
+    fi
+else
+    echo "runpod-worker-comfy: /runpod-volume/ComfyUI/models/insightface is not mounted"
+fi
+
 # First try to create a symlink
 if [ ! -d "./workflows" ] && [ -d "/workflows" ]; then
     ln -sf /workflows ./workflows
