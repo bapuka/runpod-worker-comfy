@@ -128,6 +128,114 @@ if wget https://civitai.com/api/download/models/656688 --content-disposition -O 
 else 
     echo "WARNING: Failed to download CHEYENNE_v18, but continuing with the build"
 fi
+
+cd /ComfyUI/models/loras
+if wget https://civitai.com/api/download/models/436121?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O add_details_xl.safetensors; then
+    echo "add_details_xl lora downloaded successfully"
+else
+    echo "WARNING: Failed to download add_details_xl lora, but continuing with the build"
+fi
+
+if wget wget https://civitai.com/api/download/models/723149?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O aidmaMidjourneyV6.1-v0.1.safetensors; then
+    echo "aidmaMidjourneyV6.1-v0.1 lora downloaded successfully"
+else
+    echo "WARNING: Failed to download aidmaMidjourneyV6.1-v0.1 lora, but continuing with the build"
+fi
+
+if wget https://civitai.com/api/download/models/413566?token=e7522ef2981c6950569b9ee98de0af15  --content-disposition -O sss-000009.safetensors; then
+    echo "Translucent-Subsurface-Scattering lora downloaded successfully"
+else
+    echo "WARNING: Failed to download Translucent-Subsurface-Scattering lora, but continuing with the build"
+fi
+
+if wget https://civitai.com/api/download/models/430643?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O SDXL-vanta-black_contrast_V3.0.safetensors; then
+    echo "SDXL-vanta-black_contrast_V3.0 lora downloaded successfully"
+else
+    echo "WARNING: Failed to download SDXL-vanta-black_contrast_V3.0 lora, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid_sdxl_lora.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter-faceid_sdxl_lora.safetensors; then
+    echo "ip-adapter-faceid_sdxl_lora downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter-faceid_sdxl_lora, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl_lora.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter-faceid-plusv2_sdxl_lora.safetensors; then
+    echo "ip-adapter-faceid-plusv2_sdxl_lora downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter-faceid-plusv2_sdxl_lora, but continuing with the build"
+fi
+
+cd /ComfyUI/models/clip_vision
+if wget https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors; then
+    echo "CLIP-ViT-H-14-laion2B-s32B-b79K downloaded successfully"
+else
+    echo "WARNING: Failed to download CLIP-ViT-H-14-laion2B-s32B-b79K, but continuing with the build"
+fi
+
+cd /ComfyUI/models/ipadapter
+if wget https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter_sdxl_vit-h.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter_sdxl_vit-h.safetensors; then
+    echo "ip-adapter_sdxl_vit-h downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter_sdxl_vit-h, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus_sdxl_vit-h.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter-plus_sdxl_vit-h.safetensors; then
+    echo "ip-adapter-plus_sdxl_vit-h downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter-plus_sdxl_vit-h, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter-plus-face_sdxl_vit-h.safetensors; then
+    echo "ip-adapter-plus-face_sdxl_vit-h downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter-plus-face_sdxl_vit-h, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter_sdxl.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter_sdxl.safetensors; then
+    echo "ip-adapter_sdxl downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter_sdxl, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-plusv2_sdxl.bin?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter-faceid-plusv2_sdxl.bin; then
+    echo "ip-adapter-faceid-plusv2_sdxl downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter-faceid-plusv2_sdxl, but continuing with the build"
+fi
+
+if wget https://huggingface.co/h94/IP-Adapter-FaceID/resolve/main/ip-adapter-faceid-portrait_sdxl.bin?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip-adapter-faceid-portrait_sdxl.bin; then
+    echo "ip-adapter-faceid-portrait_sdxl downloaded successfully"
+else
+    echo "WARNING: Failed to download ip-adapter-faceid-portrait_sdxl, but continuing with the build"
+fi
+
+if wget https://huggingface.co/ostris/ip-composition-adapter/blob/main/ip_plus_composition_sdxl.safetensors?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip_plus_composition_sdxl.safetensors; then
+    echo "ip_plus_composition_sdxl downloaded successfully"
+else
+    echo "WARNING: Failed to download ip_plus_composition_sdxl, but continuing with the build"
+fi
+
+if wget https://huggingface.co/Kwai-Kolors/Kolors-IP-Adapter-Plus/resolve/main/ip_adapter_plus_general.bin?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O ip_adapter_plus_general.bin; then
+    echo "ip_adapter_plus_general downloaded successfully"
+else
+    echo "WARNING: Failed to download ip_adapter_plus_general, but continuing with the build"
+fi
+
+cd /ComfyUI/models/insightface/models
+if wget https://huggingface.co/public-data/insightface/resolve/main/models/buffalo_l.zip?token=e7522ef2981c6950569b9ee98de0af15 --content-disposition -O buffalo_l.zip; then
+    echo "buffalo_l model downloaded successfully"
+else
+    echo "WARNING: Failed to download buffalo_l model, but continuing with the build"
+fi
+
+cd /ComfyUI/models/sams
+if wget https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth; then
+    echo "SAM model downloaded successfully"
+else
+    echo "WARNING: Failed to download SAM model, but continuing with the build"
+fi
+
 # if wget https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0/resolve/main/sd_xl_refiner_1.0.safetensors; then
 #     echo "SDXL Refiner downloaded successfully"
 # else
