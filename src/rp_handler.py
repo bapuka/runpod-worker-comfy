@@ -334,7 +334,7 @@ def get_upscaleSDXL_payload(workflow, payload, image_names, prefix):
     workflow["25"]["inputs"]["filename_prefix"] = prefix
     return workflow
 
-def get_img2imgPersona_payload(workflow, payload, image_names, prefix):
+def get_img2imgPersona_payload(workflow, payload, image_names, job_id):
     workflow["10"]["inputs"]["seed"] = payload["seed"]
     workflow["10"]["inputs"]["steps"] = payload["steps"]
     workflow["10"]["inputs"]["cfg"] = payload["cfg_scale"]
@@ -364,7 +364,8 @@ def get_img2imgPersona_payload(workflow, payload, image_names, prefix):
     workflow["188"]["inputs"]["image"] = image_names[2] if image_names[2] else image_names[0]
     workflow["190"]["inputs"]["image"] = image_names[3] if image_names[3] else image_names[0]    
     """ SaveImage """
-    workflow["193"]["inputs"]["filename_prefix"] = prefix
+    # workflow["193"]["inputs"]["filename_prefix"] = prefix
+    workflow["193"]["inputs"]["filename_prefix"] = payload["prefix"] + job_id
     return workflow
 
 def get_txt2imgSceneSDXL_payload(workflow, payload, prefix):
