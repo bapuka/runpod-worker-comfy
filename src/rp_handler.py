@@ -18,6 +18,7 @@ from io import BytesIO
 from PIL import Image
 import re
 from collections import defaultdict
+from upload import upload_image_to_drive
 
 # Time to wait between API check attempts in milliseconds
 COMFY_API_AVAILABLE_INTERVAL_MS = 50
@@ -720,6 +721,21 @@ def get_filenames(output):
         if 'images' in value and isinstance(value['images'], list):
             return value['images']
 
+
+def free_comfy_memory():
+    """
+    Sends a request to ComfyUI to free up memory.
+    """
+    try:
+        response = send_post_request('free', {'unload_models': False, 'free_memory': True})
+        if response.status_code == 200:
+            rp_logger.info("Successfully requested ComfyUI to free memory.")
+        else:
+            rp_logger.warning(f"Failed to free ComfyUI memory. Status code: {response.status_code}, {response.text}")
+    except Exception as e:
+        rp_logger.error(f"An error occurred while trying to free ComfyUI memory: {e}")
+
+
 # def handle_python_upscaler(image_names, job_id):
 #     """
 #     Handle the Python server upscaler functionality.
@@ -1021,7 +1037,6 @@ def handler(event):
                             if gdrive_path:
                                 # service_account_file = 'bookymn-6c6fd97214c2.json'
                                 
-                                from upload import upload_image_to_drive
                                 upload_image_to_drive(None, image_path, gdrive_path)
                                 # Upload the image to Google Drive
                                 
@@ -1035,6 +1050,7 @@ def handler(event):
                         if batch_id:
                             update_batch_status(batch_id, 'completed', prompt_id)
                             
+                        free_comfy_memory()
                         return {
                             'images': images
                         }
@@ -1079,6 +1095,7 @@ def handler(event):
             update_batch_status(batch_id, 'completed')
             rp_logger.info(f"Marked batch {batch_id} as completed due to error", job_id)
 
+        free_comfy_memory()
         return {
             'error': traceback.format_exc(),
             'refresh_worker': True
